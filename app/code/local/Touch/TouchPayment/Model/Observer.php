@@ -19,11 +19,10 @@ class Touch_TouchPayment_Model_Observer {
     {
         $shipment = $observer->getEvent()->getShipment();
         $order = $shipment->getOrder();
-        //$items = $order->getItems();
         $payment = $order->getPayment();
         $method = $payment->getMethod();
 
-        if ($method == Touch_TouchPayment_Model_Payment::METHOD_TOUCH) {
+        if (in_array($method, array(Touch_TouchPayment_Model_Payment::METHOD_TOUCH, Touch_TouchPayment_Model_Express::METHOD_TOUCH))) {
 
             $touchApi = new Touch_TouchPayment_Model_Api_Touch();
             $response = $touchApi->setOrderItemsShipped($order->getIncrementId());
