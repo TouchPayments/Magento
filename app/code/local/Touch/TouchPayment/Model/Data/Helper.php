@@ -121,12 +121,45 @@ class Touch_TouchPayment_Model_Data_Helper {
 
         $touchAddress->addressOne = $address->getStreet(1);
         $touchAddress->suburb     = $shippingData['city'];
-        $touchAddress->state      = $shippingData['region'];
+        $touchAddress->state      = self::adaptStateForTouch($shippingData['region']);
         $touchAddress->postcode   = $shippingData['postcode'];
         $touchAddress->firstName  = $shippingData['firstname'];
         $touchAddress->middleName = $shippingData['middlename'];
         $touchAddress->lastName   = $shippingData['lastname'];
 
         return $touchAddress;
+    }
+
+    public static function adaptStateForTouch($givenState)
+    {
+        $states['au'] = [
+            "NSW"   => "New South Wales",
+            "ACT"   => "Australian Capital Territory",
+            "TAS"   => "Tasmania",
+            "NT"    => "Northern Territory",
+            "SA"    => "South Australia",
+            "QLD"   => "Queensland",
+            "VIC"   => "Victoria",
+            "WA"    => "Western Australia"
+        ];
+        $givenStateUpper = mb_strtoupper($givenState);
+        if (in_array($givenStateUpper, array_keys($states))) {
+            return $givenStateUpper;
+        }
+
+        $normalizedState = static::normalizeAlpha($givenStateUpper);
+        foreach ($states['au'] as $key => $value) {
+            if ($normalizedState === self::normalizeAlpha($value)) {
+                return $key;
+            }
+        }
+        return $givenState;
+    }
+    public static function normalizeAlpha($str)
+    {
+        // lowercassing
+        $str = mb_strtolower($str);
+        // Replace not word class char by void
+        return preg_replace('/[^a-z]/', '', $str);
     }
 }
