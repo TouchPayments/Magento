@@ -1,0 +1,15 @@
+<?php $touchEndpoint = $this->getTouchUrl(); ?>
+<script>
+    touchHost = '<?= $touchEndpoint; ?>';
+</script>
+
+<?php if ($this->getPosition() == 'bottom'): ?>
+    <script
+        src="<?= $touchEndpoint; ?>/js/express.js" class="touch-express-button" id="touch-express-button"
+        data-key="pk_test_6pRNASCoBOKtIshFeQd4XMUh"
+        data-url="/touchredirect/express/index"
+        data-success-url="/touchredirect">
+    </script>
+<?php else: ?>
+    <div class="touch-express-button"></div>
+<?php endif; ?>

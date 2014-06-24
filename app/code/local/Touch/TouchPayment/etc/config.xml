@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+
+    <modules>
+        <Touch_TouchPayment>
+            <!--
+            this one correlates with tha bloody
+            sql scripts naming convenrions
+            -->
+            <version>0.2.1</version>
+        </Touch_TouchPayment>
+    </modules>
+    <!--
+    the frontend routing of things
+    -->
+    <frontend>
+        <routers>
+            <!--
+                this tag is just whatever you like to call it
+            -->
+            <touchpayment>
+                <use>standard</use>
+                <args>
+                    <module>Touch_TouchPayment</module>
+                    <!--
+                    this is the default route pretty much module name
+                    in zend
+                    http:://project/<frontName>/Controller/action
+                    -->
+                    <frontName>touchredirect</frontName>
+                </args>
+            </touchpayment>
+
+        </routers>
+        <!--
+        Layouts / Templates for SMS validation only
+        -->
+        <layout>
+            <updates>
+                <touchpayment>
+                    <!--
+                        the layout file
+                    -->
+                    <file>touch.xml</file>
+                </touchpayment>
+            </updates>
+
+            <default>
+                <reference name="head">
+                    <action method="addJs"><script>touchpayments/opcheckout.js</script></action>
+                </reference>
+            </default>
+        </layout>
+    </frontend>
+    <global>
+
+        <blocks>
+            <touchpayment>
+                <class>Touch_TouchPayment_Block</class>
+            </touchpayment>
+        </blocks>
+
+        <!-- declare model group for new module -->
+        <models>
+            <!-- model group alias to be used in Mage::getModel('touch_touchpayment/...') -->
+            <touch_touchpayment>
+                <!-- base class name for the model group -->
+                <class>Touch_TouchPayment_Model</class>
+            </touch_touchpayment>
+        </models>
+
+        <events>
+            <!--
+                observe the event for shipment in backend
+                as soon as an item is shipped the API will be called
+                to activate an order
+            -->
+            <sales_order_shipment_save_after>
+                <observers>
+                    <touch_touchpayment>
+                        <class>touch_touchpayment/observer</class>
+                        <method>setOrderShipped</method>
+                        <type>singleton</type>
+                    </touch_touchpayment>
+                </observers>
+            </sales_order_shipment_save_after>
+            <!--
+                make sure the fee amount shows up on
+                invoices as well
+            -->
+            <sales_order_invoice_save_after>
+                <observers>
+                    <sales_order_invoice_save_after>
+                        <class>touch_touchpayment/observer</class>
+                        <method>invoiceSaveAfter</method>
+                    </sales_order_invoice_save_after>
+                </observers>
+            </sales_order_invoice_save_after>
+        </events>
+
+        <!-- declare resource setup for new module -->
+        <resources>
+            <!-- resource identifier -->
+            <touch_setup>
+                <!-- specify that this resource is a setup resource and used for upgrades -->
+                <setup>
+                    <!-- which module to look for install/upgrade files in -->
+                    <module>Touch_TouchPayment</module>
+                </setup>
+                <!-- specify database connection for this resource -->
+                <connection>
+                    <!-- do not create new connection, use predefined core setup connection -->
+                    <use>core_setup</use>
+                </connection>
+            </touch_setup>
+            <touch_touchpayment_write>
+                <connection>
+                    <use>core_write</use>
+                </connection>
+            </touch_touchpayment_write>
+            <touch_touchpayment_read>
+                <connection>
+                    <use>core_read</use>
+                </connection>
+            </touch_touchpayment_read>
+        </resources>
+        <!--
+            This seems to be yet another event trigger in magento
+            which might get rid of the observer implementation
+        -->
+        <sales>
+            <quote>
+                <totals>
+                    <extensionfee>
+                        <class>touch_touchpayment/sales_quote_address_total_extensionfee</class>
+                        <after>payment</after>
+                        <after>tax,grand_total</after>
+                    </extensionfee>
+                    <payment_charge>
+                        <class>touch_touchpayment/sales_quote_address_total_fee</class>
+                        <after>payment</after>
+                        <after>tax,grand_total</after>
+                    </payment_charge>
+                </totals>
+            </quote>
+            <!--
+               hook into invoice to apply the Touch fee
+               on collect()
+            -->
+            <order_invoice>
+                <totals>
+                    <fee>
+                        <class>touch_touchpayment/sales_order_total_invoice_fee</class>
+                    </fee>
+                    <extensionfee>
+                        <class>touch_touchpayment/sales_order_total_invoice_extensionfee</class>
+                    </extensionfee>
+                </totals>
+            </order_invoice>
+
+        </sales>
+
+        <!--
+            Apparently this copies the fee from the quote to the order object
+            well fingerst crossed then mate ;-)
+        -->
+        <fieldsets>
+            <sales_convert_quote_address>
+                <!-- Touch Fee -->
+                <touch_fee_amount>
+                    <to_order>*</to_order>
+                </touch_fee_amount>
+                <touch_base_fee_amount>
+                    <to_order>*</to_order>
+                </touch_base_fee_amount>
+
+                <!-- Touch Extension Fee -->
+                <touch_extension_fee_amount>
+                    <to_order>*</to_order>
+                </touch_extension_fee_amount>
+                <touch_base_extension_fee_amount>
+                    <to_order>*</to_order>
+                </touch_base_extension_fee_amount>
+
+                <!-- Touch Extension Days -->
+                <touch_extension_fee_days>
+                    <to_order>*</to_order>
+                </touch_extension_fee_days>
+                <touch_base_extension_fee_days>
+                    <to_order>*</to_order>
+                </touch_base_extension_fee_days>
+            </sales_convert_quote_address>
+        </fieldsets>
+        <!--
+            Adjust the pdf
+        -->
+        <pdf>
+            <totals>
+                <fee translate="title">
+                    <title>Touch Payment Fee</title>
+                    <source_field>touch_fee_amount</source_field>
+                    <font_size>7</font_size>
+                    <display_zero>0</display_zero>
+                    <sort_order>650</sort_order>
+                    <amount_prefix></amount_prefix>
+                </fee>
+                <extensionfee translate="title">
+                    <title>Touch Payment Extension Fee</title>
+                    <source_field>touch_extension_fee_amount</source_field>
+                    <font_size>7</font_size>
+                    <display_zero>0</display_zero>
+                    <sort_order>651</sort_order>
+                    <amount_prefix></amount_prefix>
+                </extensionfee>
+            </totals>
+        </pdf>
+    </global>
+
+
+
+    <!-- declare default configuration values for this module -->
+    <default>
+        <!-- 'payment' configuration section (tab) -->
+        <payment>
+            <touch_touchpayment>
+                <active>0</active>
+                <model>touch_touchpayment/payment</model>
+                <order_status>pending</order_status>
+                <title>Touch Payments</title>
+                <payment_action>authorize</payment_action>
+                <allowspecific>0</allowspecific>
+            </touch_touchpayment>
+            <touch_touchexpress>
+                <active>0</active>
+                <model>touch_touchpayment/express</model>
+                <order_status>pending</order_status>
+                <visible_on_cart>1</visible_on_cart>
+                <visible_on_product>1</visible_on_product>
+                <max_cart>400</max_cart>
+                <title>Touch Express</title>
+                <payment_action>authorize</payment_action>
+                <allowspecific>0</allowspecific>
+            </touch_touchexpress>
+        </payment>
+    </default>
+    <adminhtml>
+        <layout>
+            <updates>
+                <fee>
+                    <file>touchfee.xml</file>
+                </fee>
+            </updates>
+        </layout>
+    </adminhtml>
+
+</config>

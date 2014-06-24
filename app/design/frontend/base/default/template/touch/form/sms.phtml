@@ -1,0 +1,48 @@
+<div class="a-center">
+    <div><img src="<?php echo $this->getSkinUrl('images/touchpayments/touch-logo.png');?>" height="34"/></div>
+    <h1 class="a-center">Almost done!</h1>
+
+    <p>To complete your order please enter the SMS code sent to you by Touch Payments.</p>
+    <!--
+    <?php if(!empty($this->errorMessage)):?>
+        <p><?php echo $this->errorMessage;?></p>
+    <?php endif;?>
+    -->
+    <form action="" method="post" id="sms-form">
+        <div class="input-box">
+            <input type="text" placeholder="Enter SMS code" maxlength="6" name="smsCode" value="" id="sms-code" class="input-text required-entry" title="<?php echo $this->__('SMS Code') ?>" />
+            <button type="submit" class="button" title="<?php echo $this->__('Submit') ?>" name="send" id="sendCode"><span><span><?php echo $this->__('Submit') ?></span></span></button>
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+    $('sendCode').observe('click', function(e) {
+        e.preventDefault();
+        if ($$('[name="smsCode"]')[0].value) {
+
+            var request = new Ajax.Request(
+                '/touchredirect/index/sms/',
+                {
+                    method: 'post',
+                    parameters: Form.serialize($('sms-form')),
+                    onSuccess: function(transport) {
+                        try {
+                            response = eval('(' + transport.responseText + ')');
+                        } catch (e) {
+                            response = {};
+                        }
+
+                        if (response.redirect) {
+                            window.location.href = response.redirect;
+                        } else if (response.success === false) {
+                            alert (response.responseText);
+                            $$('[name="smsCode"]')[0].value = '';
+                        }
+
+                    }
+                }
+            );
+        }
+    });
+</script>

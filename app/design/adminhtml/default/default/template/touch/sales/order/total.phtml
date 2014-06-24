@@ -1,0 +1,17 @@
+<?php $this->setPriceDataObject($this->getSource()) ?>
+<?php if ((float) $this->getSource()->getTouchFeeAmount()): ?>
+    <tr>
+        <td class="label">Touch Payment Fee:</td>
+        <td>
+            <?php echo $this->displayPrices($this->getSource()->getTouchBaseFeeAmount(), $this->getSource()->getTouchFeeAmount()); ?>
+        </td>
+    </tr>
+        <?php endif; ?>
+    <?php if ((float) $this->getSource()->getTouchExtensionFeeAmount()): ?>
+        <tr>
+            <td class="label">Touch Payment Extension Fee:</td>
+            <td>
+                <?php echo $this->displayPrices($this->getSource()->getTouchBaseExtensionFeeAmount(), $this->getSource()->getTouchExtensionFeeAmount()); ?>
+            </td>
+        </tr>
+    <?php endif; ?>

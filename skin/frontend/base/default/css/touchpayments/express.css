@@ -1,0 +1,39 @@
+.tpe-submit {
+    background-color: #76DE5D;
+    background-image: none;
+    border: 0;
+    color: #fff;
+    height: 40px;
+    line-height: 40px;
+    padding: 0 12px;
+    font-family: Helvetica, Arial, sans-serif;
+    text-transform: uppercase;
+    font-size: 14px;
+    text-decoration: none;
+    letter-spacing: 1px;
+    cursor: pointer;
+
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    -o-border-radius: 4px;
+    -ms-border-radius: 4px;
+    -khtml-border-radius: 4px;
+    border-radius: 4px;
+    -webkit-transition: All 0.3s ease;
+    -moz-transition: All 0.3s ease;
+    -o-transition: All 0.3s ease;
+    -ms-transition: All 0.3s ease;
+    transition: All 0.3s ease;
+}
+
+.tpe-submit img {
+    margin-top: 8px;
+}
+
+.tpe-submit:hover, .tpe-submit:active, .tpe-submit:focus {
+    background-color: #4F9A3A;
+}
+
+#p_method_touch_touchexpress, label[for="p_method_touch_touchexpress"], #container_payment_method_touch_touchexpress {
+    display: none;
+}

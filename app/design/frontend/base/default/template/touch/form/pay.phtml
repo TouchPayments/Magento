@@ -1,0 +1,47 @@
+<?php $this->getOrderData(); ?>
+<ul class="form-list" id="payment_form_<?= $this->getMethodCode() ?>" style="display:none;">
+    <li>
+        Checkout with Touch Payments and <strong>pay after you receive your products</strong>. <a href="http://touchpayments.com.au/what-is-touch?merchant=<?= urlencode(Mage::app()->getStore()->getName()); ?>" target="_blank">Find out more.</a>
+    </li>
+
+    <li>
+        <fieldset>
+            <ul class="form-list">
+                <li class="fields">
+                    <div class="field">
+                        <label for="payment:mobile" class="required"><em>*</em><?php echo $this->__('Telephone') ?></label>
+                        <div class="input-box">
+                            <input type="text" id="payment:mobile" name="payment[mobile]" value="<?= $this->telephoneMobile; ?>" title="<?php echo $this->__('Telephone') ?>" class="input-text required-entry" />
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="payment:dob" class="required"><em>*</em><?php echo $this->__('Date of Birth') ?></label>
+                        <div class="input-box">
+                            <input type="text" name="payment[dob]" id="payment:dob" value="<?= $this->dob; ?>" title="<?php echo $this->__('Date of Birth') ?>" class="input-text required-entry" />
+                        </div>
+                    </div>
+                    <?php
+                    if (count($this->extensions)):
+    ?>
+                        <div class="field">
+                                    <label for="payment:extension_days"><?php echo $this->__('When would you like to pay?') ?></label>
+                                <div class="input-box">
+                                    <select name="payment[extension_days]" id="payment:extension_days" title="<?php echo $this->__('Extension') ?>">
+                                        <option value="0">Up to <?= $this->initialDelay ?> days - Free</option>
+                                            <?php foreach ($this->extensions as $extension): ?>
+                                        <option value="<?= $extension->days ?>">Up to <?= $this->initialDelay + $extension->days ?> days - $<?= $extension->amount ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                            </div>
+<?php endif; ?>
+                </li>
+            </ul>
+        </fieldset>
+    </li>
+</ul>
+<div>
+    <?php echo $this->getMethod()->getConfigData('message');?>
+</div>
+
+
