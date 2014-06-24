@@ -1,10 +1,12 @@
 <?php
+
 /**
  * Data Helper
  *
  * @copyright  2013 Touch Payments / Checkn Pay Ltd Pltd
  */
-class Touch_TouchPayment_Model_Data_Helper {
+class Touch_TouchPayment_Model_Data_Helper
+{
 
     public static function getTouchOrder(Mage_Sales_Model_Order $order)
     {
@@ -21,7 +23,8 @@ class Touch_TouchPayment_Model_Data_Helper {
         $touchOrder = new Touch_Order();
         $touchOrder->addressBilling = self::processAddress($order->getBillingAddress());
         $touchOrder->addressShipping = self::processAddress($order->getShippingAddress());
-        $grandTotal = $order->getGrandTotal() - $order->getTouchBaseFeeAmount() - $order->getTouchBaseExtensionFeeAmount();
+        $grandTotal
+            = $order->getGrandTotal() - $order->getTouchBaseFeeAmount() - $order->getTouchBaseExtensionFeeAmount();
         $touchOrder->grandTotal = $grandTotal;
         $touchOrder->shippingCosts = $order->getShippingAmount();
         $touchOrder->gst = $order->getTaxAmount();
@@ -73,7 +76,7 @@ class Touch_TouchPayment_Model_Data_Helper {
         $touchItems = $processedItems = array();
 
         foreach ($items as $item) {
-            $sku    = $item->getSku();
+            $sku = $item->getSku();
             $parent = $item->getParentItemId();
             $quantityHandler = $item instanceof Mage_Sales_Model_Quote_Item ? 'getQty' : 'getQtyOrdered';
 
@@ -101,7 +104,7 @@ class Touch_TouchPayment_Model_Data_Helper {
                 $touchItem = new Touch_Item();
                 $touchItem->sku = $sku;
                 $touchItem->quantity = $item->{$quantityHandler}();
-                $touchItem->description = $item->getName() . ' ' . (string) $item->getGiftMessageAvailable();
+                $touchItem->description = $item->getName() . ' ' . (string)$item->getGiftMessageAvailable();
                 $touchItem->price = $item->getPriceInclTax();
                 $touchItems[$sku] = $touchItem;
                 $processedItems[$item->getItemId()] = $sku;
@@ -120,28 +123,32 @@ class Touch_TouchPayment_Model_Data_Helper {
         }
 
         $touchAddress->addressOne = $address->getStreet(1);
-        $touchAddress->suburb     = $shippingData['city'];
-        $touchAddress->state      = self::adaptStateForTouch($shippingData['region']);
-        $touchAddress->postcode   = $shippingData['postcode'];
-        $touchAddress->firstName  = $shippingData['firstname'];
+        $touchAddress->suburb = $shippingData['city'];
+        $touchAddress->state = self::adaptStateForTouch($shippingData['region']);
+        $touchAddress->postcode = $shippingData['postcode'];
+        $touchAddress->firstName = $shippingData['firstname'];
         $touchAddress->middleName = $shippingData['middlename'];
-        $touchAddress->lastName   = $shippingData['lastname'];
+        $touchAddress->lastName = $shippingData['lastname'];
 
         return $touchAddress;
     }
 
+
     public static function adaptStateForTouch($givenState)
     {
-        $states['au'] = [
-            "NSW"   => "New South Wales",
-            "ACT"   => "Australian Capital Territory",
-            "TAS"   => "Tasmania",
-            "NT"    => "Northern Territory",
-            "SA"    => "South Australia",
-            "QLD"   => "Queensland",
-            "VIC"   => "Victoria",
-            "WA"    => "Western Australia"
-        ];
+
+        $states = array(
+            'au' => array(
+                "NSW" => "New South Wales",
+                "ACT" => "Australian Capital Territory",
+                "TAS" => "Tasmania",
+                "NT"  => "Northern Territory",
+                "SA"  => "South Australia",
+                "QLD" => "Queensland",
+                "VIC" => "Victoria",
+                "WA"  => "Western Australia"
+            )
+        );
         $givenStateUpper = mb_strtoupper($givenState);
         if (in_array($givenStateUpper, array_keys($states))) {
             return $givenStateUpper;
@@ -155,6 +162,7 @@ class Touch_TouchPayment_Model_Data_Helper {
         }
         return $givenState;
     }
+
     public static function normalizeAlpha($str)
     {
         // lowercassing
