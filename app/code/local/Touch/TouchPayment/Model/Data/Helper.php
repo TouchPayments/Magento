@@ -32,6 +32,7 @@ class Touch_TouchPayment_Model_Data_Helper
         $touchOrder->customer = $customer;
         $extensionDays = $session['extension_days'];
         $touchOrder->extendingDays = $extensionDays;
+        $touchOrder->shippingMethods = array();
 
         return $touchOrder;
     }
