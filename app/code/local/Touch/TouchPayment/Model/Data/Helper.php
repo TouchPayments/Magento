@@ -67,7 +67,7 @@ class Touch_TouchPayment_Model_Data_Helper
         $touchOrder->shippingCosts = 0;
         $touchOrder->gst = 0; // Not available at quote level, will be confirmed at a later stage
         $touchOrder->items = self::processItems($quote->getAllItems());
-        $touchOrder->clientSessionId = session_id();
+        $touchOrder->clientSessionId = Mage::getSingleton("core/session")->getEncryptedSessionId();
 
         return $touchOrder;
     }
