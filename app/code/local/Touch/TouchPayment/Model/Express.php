@@ -59,7 +59,7 @@ class Touch_TouchPayment_Model_Express extends Mage_Payment_Model_Method_Abstrac
     /**
      * Can show this payment method as an option on checkout payment page?
      */
-    protected $_canUseCheckout = true;
+    protected $_canUseCheckout = false;
 
     /**
      * Is this payment method suitable for multi-shipping checkout?
