@@ -85,6 +85,19 @@
                 </observers>
             </sales_order_shipment_save_after>
             <!--
+                Set Orders to Pending until the shop confirms that
+                Touch Payments has accepted the order
+            -->
+            <sales_order_payment_place_end>
+                <observers>
+                    <touch_touchpayment>
+                        <class>touch_touchpayment/observer</class>
+                        <method>setTouchOrderPending</method>
+                        <type>singleton</type>
+                    </touch_touchpayment>
+                </observers>
+            </sales_order_payment_place_end>
+            <!--
                 make sure the fee amount shows up on
                 invoices as well
             -->
@@ -252,5 +265,14 @@
             </updates>
         </layout>
     </adminhtml>
+
+    <crontab>
+        <jobs>
+            <order_cancel_orders>
+                <schedule><cron_expr>*/15 * * * *</cron_expr></schedule>
+                <run><model>touch_touchpayment/observer::autoCancelPendingOrders</model></run>
+            </order_cancel_orders>
+        </jobs>
+    </crontab>
 
 </config>

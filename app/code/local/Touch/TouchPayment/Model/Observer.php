@@ -57,4 +57,42 @@ class Touch_TouchPayment_Model_Observer {
         return $this;
     }
 
+    public function setTouchOrderPending(Varien_Event_Observer $observer)
+    {
+        $payment = $observer->getEvent()->getPayment();
+        $order   = $payment->getOrder();
+        $method  = $payment->getMethod();
+
+        if (in_array($method, array(Touch_TouchPayment_Model_Payment::METHOD_TOUCH))) {
+            $order->setState(Mage_Sales_Model_Order::STATE_NEW, true)->save();
+        }
+    }
+
+    public function autoCancelPendingOrders()
+    {
+        $orderCollection = Mage::getResourceModel('sales/order_collection');
+
+        $orderCollection
+            ->addFieldToFilter('status', 'pending')
+            ->addFieldToFilter('state', 'new')
+            ->addFieldToFilter('created_at', array(
+                    'lt' =>  new Zend_Db_Expr("DATE_ADD('".now()."', INTERVAL -'60:00' HOUR_MINUTE)")))
+            ->addFieldToFilter('sales_flat_order_payment.method', Touch_TouchPayment_Model_Payment::METHOD_TOUCH)
+            ->getSelect()
+            ->join('sales_flat_order_payment', 'main_table.entity_id=sales_flat_order_payment.entity_id', false, null, 'inner')
+            ->limit(40);
+
+        foreach($orderCollection->getItems() as $order) {
+
+            $orderModel = Mage::getModel('sales/order');
+            $orderModel->load($order['entity_id']);
+
+            if ($orderModel->canCancel()) {
+                $orderModel->registerCancellation('Touch Payments - Order has timed out');
+                $orderModel->save();
+            }
+        }
+
+    }
+
 }

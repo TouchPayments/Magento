@@ -1,11 +1,12 @@
 <?php
+
 /**
  * Controller which will be redirected to from Touch's website
  *
  * @copyright  2013 Touch Payments / Checkn Pay Ltd Pltd
  */
-class Touch_TouchPayment_IndexController extends Mage_Core_Controller_Front_Action {
-
+class Touch_TouchPayment_IndexController extends Mage_Core_Controller_Front_Action
+{
 
 
     public function smsAction()
@@ -13,8 +14,8 @@ class Touch_TouchPayment_IndexController extends Mage_Core_Controller_Front_Acti
         $this->loadLayout();
 
         $session = Mage::getSingleton('checkout/session');
-        $token   = $session['touchToken'];
-        $order   = Mage::getModel('sales/order')->loadByAttribute('touch_token', $token);
+        $token = $session['touchToken'];
+        $order = Mage::getModel('sales/order')->loadByAttribute('touch_token', $token);
         $this->getLayout()->getBlock('sms')->assign('order', $order);
 
 
@@ -25,13 +26,17 @@ class Touch_TouchPayment_IndexController extends Mage_Core_Controller_Front_Acti
                  * Approve the order via SMS
                  */
 
-                $result  = $this->_approveTouchOrderViaSMSCode($order, $code);
-                if(isset($result->error->code) && Touch_ErrorCodes::ERR_WRONG_SMS_CODE == $result->error->code) {
-                    $this->getResponse()->setBody(Mage::helper('core')->jsonEncode(array(
+                $result = $this->_approveTouchOrderViaSMSCode($order, $code);
+                if (isset($result->error->code) && Touch_ErrorCodes::ERR_WRONG_SMS_CODE == $result->error->code) {
+                    $this->getResponse()->setBody(
+                        Mage::helper('core')->jsonEncode(
+                            array(
                                 'success'      => false,
                                 'error'        => true,
                                 'responseText' => $result->error->message
-                            )));
+                            )
+                        )
+                    );
                     return;
                 } else {
                     $this->_handleTouchApprovalResponse($order, $result);
@@ -41,11 +46,15 @@ class Touch_TouchPayment_IndexController extends Mage_Core_Controller_Front_Acti
 
             } else {
 
-                $this->getResponse()->setBody(Mage::helper('core')->jsonEncode(array(
-                    'success'      => false,
-                    'error'        => true,
-                    'responseText' => 'The code is incorrect, please try again.'
-                )));
+                $this->getResponse()->setBody(
+                    Mage::helper('core')->jsonEncode(
+                        array(
+                            'success'      => false,
+                            'error'        => true,
+                            'responseText' => 'The code is incorrect, please try again.'
+                        )
+                    )
+                );
 
                 return;
             }
@@ -55,11 +64,15 @@ class Touch_TouchPayment_IndexController extends Mage_Core_Controller_Front_Acti
          * load the layout design/frontend/default/default/layout/touch.xml
          */
 
-        $this->getResponse()->setBody(Mage::helper('core')->jsonEncode(array(
-            'success'      => true,
-            'error'        => false,
-            'responseText' => $this->getLayout()->getBlock('sms')->toHtml()
-        )));
+        $this->getResponse()->setBody(
+            Mage::helper('core')->jsonEncode(
+                array(
+                    'success'      => true,
+                    'error'        => false,
+                    'responseText' => $this->getLayout()->getBlock('sms')->toHtml()
+                )
+            )
+        );
     }
 
     public function indexAction()
@@ -81,19 +94,22 @@ class Touch_TouchPayment_IndexController extends Mage_Core_Controller_Front_Acti
         }
 
         if (isset($result->error)) {
-            //throw new Mage_Exception($response->error->message);
+            // Cancel order
+            $order->registerCancellation($result->error->message)->save();
+
             Mage::getSingleton('core/session')->addError($result->error->message);
             $this->_redirect('checkout/onepage/failure/');
             return;
         }
         if ($result->result->status != 'pending') {
-            //@todo cancel order and stuff
             $message = null;
             if (isset($result->reasonCancelled)) {
                 $message = 'Touch Payment returned and said:' . $result->reasonCancelled;
             } else {
                 $message = 'Got an error:' . var_export($result, true);
             }
+
+            $order->registerCancellation($message)->save();
             Mage::getSingleton('core/session')->addError($message);
             $this->_redirect('checkout/onepage/failure/');
             //throw new Mage_Exception('Wrong Status');
@@ -103,18 +119,22 @@ class Touch_TouchPayment_IndexController extends Mage_Core_Controller_Front_Acti
              * adjust the touch fee that comes back from
              * the API in case the fee has changed
              */
-            if ((float) $result->result->fee > 0 && $order->getTouchFeeAmount() != $result->result->fee) {
+            if ((float)$result->result->fee > 0 && $order->getTouchFeeAmount() != $result->result->fee) {
                 $order->setGrandTotal($order->getGrandTotal() - $order->getTouchFeeAmount() + $result->result->fee);
-                $order->setTouchFeeAmount((float) $result->result->fee);
-                $order->setTouchBaseFeeAmount((float) $result->result->fee);
+                $order->setTouchFeeAmount((float)$result->result->fee);
+                $order->setTouchBaseFeeAmount((float)$result->result->fee);
                 $order->save();
             }
             // Same here with extension fee
-            if ((float) $result->result->extensionFee > 0 && $order->getTouchExtensionFeeAmount() != $result->result->extensionFee) {
-                $order->setGrandTotal($order->getGrandTotal() - $order->getTouchExtensionFeeAmount() + $result->result->extensionFee);
+            if ((float)$result->result->extensionFee > 0
+                && $order->getTouchExtensionFeeAmount() != $result->result->extensionFee
+            ) {
+                $order->setGrandTotal(
+                    $order->getGrandTotal() - $order->getTouchExtensionFeeAmount() + $result->result->extensionFee
+                );
 
-                $order->setTouchExtensionFeeAmount((float) $result->result->extensionFee);
-                $order->setTouchBaseExtensionFeeAmount((float) $result->result->extensionFee);
+                $order->setTouchExtensionFeeAmount((float)$result->result->extensionFee);
+                $order->setTouchBaseExtensionFeeAmount((float)$result->result->extensionFee);
                 $order->save();
             }
             /**
@@ -143,68 +163,83 @@ class Touch_TouchPayment_IndexController extends Mage_Core_Controller_Front_Acti
     private function _handleTouchApprovalResponse(Mage_Sales_Model_Order $order, $apprReturn)
     {
         if ($apprReturn->result->status == 'approved') {
-                $order->addStatusHistoryComment('Touch Status : ----')
-                        ->setIsCustomerNotified(false)
-                        ->save();
-                $payment = $order->getPayment();
-                $grandTotal = $order->getBaseGrandTotal();
-                $payment->setTransactionId($apprReturn->result->refNumber)
-                        ->setPreparedMessage("Payment Sucessfull Result:")
-                        ->setIsTransactionClosed(0)
-                        ->registerAuthorizationNotification($grandTotal);
-                $order->save();
+            $order->addStatusHistoryComment('Touch Status : ----')
+                ->setIsCustomerNotified(false)
+                ->save();
+            $payment = $order->getPayment();
+            $grandTotal = $order->getBaseGrandTotal();
+            $payment->setTransactionId($apprReturn->result->refNumber)
+                ->setPreparedMessage("Payment Sucessfull Result:")
+                ->setIsTransactionClosed(0)
+                ->registerAuthorizationNotification($grandTotal);
+            $order->save();
 
 
-                try {
-                    if (!$order->canInvoice()) {
-                        Mage::throwException(Mage::helper('core')->__('Cannot create an invoice.'));
-                    }
-
-                    $invoice = Mage::getModel('sales/service_order', $order)->prepareInvoice();
-
-                    if (!$invoice->getTotalQty()) {
-                        Mage::throwException(Mage::helper('core')->__('Cannot create an invoice without products.'));
-                    }
-
-                    $invoice->setRequestedCaptureCase(Mage_Sales_Model_Order_Invoice::CAPTURE_OFFLINE);
-                    $invoice->register();
-                    $transactionSave = Mage::getModel('core/resource_transaction')
-                            ->addObject($invoice)
-                            ->addObject($invoice->getOrder());
-
-                    $transactionSave->save();
-                    $message = 'Notified customer about invoice #' . $invoice->getIncrementId() . '.';
-                    $order->sendNewOrderEmail()->addStatusHistoryComment($message)
-                            ->setIsCustomerNotified(true)
-                            ->save();
-                } catch (Mage_Core_Exception $e) {
-                    Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+            try {
+                if (!$order->canInvoice()) {
+                    Mage::throwException(Mage::helper('core')->__('Cannot create an invoice.'));
                 }
 
-             if ($this->getRequest()->isXmlHttpRequest()) {
-                $this->getResponse()->setBody(Mage::helper('core')->jsonEncode(array(
-                    'success'  => true,
-                    'error'    => false,
-                    'redirect' => '/checkout/onepage/success/'
-                )));
-             } else {
-                 $url = Mage::getUrl('checkout/onepage/success');
-                 Mage::register('redirect_url', $url);
-                 $this->_redirectUrl($url);
-             }
-        } else {
+                $invoice = Mage::getModel('sales/service_order', $order)->prepareInvoice();
+
+                if (!$invoice->getTotalQty()) {
+                    Mage::throwException(Mage::helper('core')->__('Cannot create an invoice without products.'));
+                }
+
+                $invoice->setRequestedCaptureCase(Mage_Sales_Model_Order_Invoice::CAPTURE_OFFLINE);
+                $invoice->register();
+                $transactionSave = Mage::getModel('core/resource_transaction')
+                    ->addObject($invoice)
+                    ->addObject($invoice->getOrder());
+
+                $transactionSave->save();
+                $message = 'Notified customer about invoice #' . $invoice->getIncrementId() . '.';
+                $order->sendNewOrderEmail()->addStatusHistoryComment($message)
+                    ->setIsCustomerNotified(true)
+                    ->save();
+
+                // Set order to processing, all good.
+                $method = $payment->getMethodInstance();
+                $orderStatus = $method->getConfigData('order_status');
+                $order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, $orderStatus)->save();
+
+            } catch (Mage_Core_Exception $e) {
+                Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+            }
+
             if ($this->getRequest()->isXmlHttpRequest()) {
-                $this->getResponse()->setBody(Mage::helper('core')->jsonEncode(array(
-                         'success'  => false,
-                         'error'    => true,
-                         'redirect' => '/checkout/onepage/failure/'
-                     )));
+                $this->getResponse()->setBody(
+                    Mage::helper('core')->jsonEncode(
+                        array(
+                            'success'  => true,
+                            'error'    => false,
+                            'redirect' => '/checkout/onepage/success/'
+                        )
+                    )
+                );
+            } else {
+                $url = Mage::getUrl('checkout/onepage/success');
+                Mage::register('redirect_url', $url);
+                $this->_redirectUrl($url);
+            }
+        } else {
+            $order->registerCancellation()->save();
+            if ($this->getRequest()->isXmlHttpRequest()) {
+                $this->getResponse()->setBody(
+                    Mage::helper('core')->jsonEncode(
+                        array(
+                            'success'  => false,
+                            'error'    => true,
+                            'redirect' => '/checkout/onepage/failure/'
+                        )
+                    )
+                );
                 Mage::getSingleton('core/session')->addError('Wrong return status.');
-             } else {
-                 $url = Mage::getUrl('checkout/onepage/failure');
-                 Mage::register('redirect_url', $url);
-                 $this->_redirectUrl($url);
-             }
+            } else {
+                $url = Mage::getUrl('checkout/onepage/failure');
+                Mage::register('redirect_url', $url);
+                $this->_redirectUrl($url);
+            }
         }
     }
 
@@ -223,7 +258,8 @@ class Touch_TouchPayment_IndexController extends Mage_Core_Controller_Front_Acti
     /**
      *
      * @param Mage_Sales_Model_Order $order
-     * @param string $code
+     * @param string                 $code
+     *
      * @return type
      */
     private function _approveTouchOrderViaSMSCode(Mage_Sales_Model_Order $order, $code)
@@ -244,12 +280,15 @@ class Touch_TouchPayment_IndexController extends Mage_Core_Controller_Front_Acti
     /**
      * Don't get any ideas... Just returning the grandtotal of an order,
      * stripped of TouchFees
+     *
      * @param Mage_Sales_Model_Order $order
+     *
      * @return float
      */
     private function _getNakedGrandTotal(Mage_Sales_Model_Order $order)
     {
-        return (float) ($order->getGrandTotal() - $order->getTouchBaseFeeAmount() - $order->getTouchBaseExtensionFeeAmount());
+        return (float)($order->getGrandTotal() - $order->getTouchBaseFeeAmount()
+            - $order->getTouchBaseExtensionFeeAmount());
     }
 
     public function successAction()
@@ -261,18 +300,18 @@ class Touch_TouchPayment_IndexController extends Mage_Core_Controller_Front_Acti
         try {
             if ($request['Status_'] == 05) {
                 $comment = $order->sendNewOrderEmail()->addStatusHistoryComment('Bank Status : Declined By Bank')
-                        ->setIsCustomerNotified(false)
-                        ->save();
+                    ->setIsCustomerNotified(false)
+                    ->save();
                 $this->_forward('error');
             } elseif ($request['Status_'] == 90) {
                 $comment = $order->sendNewOrderEmail()->addStatusHistoryComment('Bank Status : Comm. Failed')
-                        ->setIsCustomerNotified(false)
-                        ->save();
+                    ->setIsCustomerNotified(false)
+                    ->save();
                 $this->_forward('error');
             } elseif ($request['Status_'] == 00) {
                 $comment = $order->sendNewOrderEmail()->addStatusHistoryComment('Bank Status : ----')
-                        ->setIsCustomerNotified(false)
-                        ->save();
+                    ->setIsCustomerNotified(false)
+                    ->save();
                 $payment = $order->getPayment();
                 $grandTotal = $order->getBaseGrandTotal();
                 if (isset($request['Transactionid'])) {
@@ -282,9 +321,9 @@ class Touch_TouchPayment_IndexController extends Mage_Core_Controller_Front_Acti
                 }
 
                 $payment->setTransactionId($tid)
-                        ->setPreparedMessage("Payment Sucessfull Result:")
-                        ->setIsTransactionClosed(0)
-                        ->registerAuthorizationNotification($grandTotal);
+                    ->setPreparedMessage("Payment Sucessfull Result:")
+                    ->setIsTransactionClosed(0)
+                    ->registerAuthorizationNotification($grandTotal);
                 $order->save();
 
 
@@ -310,14 +349,17 @@ class Touch_TouchPayment_IndexController extends Mage_Core_Controller_Front_Acti
                     //$invoice->setRequestedCaptureCase(Mage_Sales_Model_Order_Invoice::CAPTURE_OFFLINE);
                     $invoice->register();
                     $transactionSave = Mage::getModel('core/resource_transaction')
-                            ->addObject($invoice)
-                            ->addObject($invoice->getOrder());
+                        ->addObject($invoice)
+                        ->addObject($invoice->getOrder());
 
                     $transactionSave->save();
-                    $message = Mage::helper('pay')->__('Notified customer about invoice #%s.', $invoice->getIncrementId());
+                    $message = Mage::helper('pay')->__(
+                        'Notified customer about invoice #%s.',
+                        $invoice->getIncrementId()
+                    );
                     $comment = $order->sendNewOrderEmail()->addStatusHistoryComment($message)
-                            ->setIsCustomerNotified(true)
-                            ->save();
+                        ->setIsCustomerNotified(true)
+                        ->save();
                 } catch (Mage_Core_Exception $e) {
 
                 }
@@ -331,6 +373,7 @@ class Touch_TouchPayment_IndexController extends Mage_Core_Controller_Front_Acti
             Mage::logException($e);
         }
     }
+
     /**
      * Get one page checkout model
      *
@@ -356,15 +399,15 @@ class Touch_TouchPayment_IndexController extends Mage_Core_Controller_Front_Acti
             if ($order->getId()) {
                 //Cancel order
                 if ($order->getState() != Mage_Sales_Model_Order::STATE_CANCELED) {
-                    $order->registerCancellation($errorMsg)->save();
+                    $order->registerCancellation()->save();
                 }
                 $quote = Mage::getModel('sales/quote')
-                        ->load($order->getQuoteId());
+                    ->load($order->getQuoteId());
                 //Return quote
                 if ($quote->getId()) {
                     $quote->setIsActive(1)
-                            ->setReservedOrderId(NULL)
-                            ->save();
+                        ->setReservedOrderId(null)
+                        ->save();
                     $session->replaceQuote($quote);
                 }
 
