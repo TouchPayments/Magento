@@ -133,6 +133,7 @@ class Touch_TouchPayment_IndexController extends Mage_Core_Controller_Front_Acti
 
     public function confirmAction()
     {
+        $this->cleaningAfterSuccess();
         $this->loadLayout();
         $this->getLayout()->getBlock('head')->setTitle($this->__('Please confirm your order'));
         $this->renderLayout();
@@ -191,7 +192,6 @@ class Touch_TouchPayment_IndexController extends Mage_Core_Controller_Front_Acti
                  Mage::register('redirect_url', $url);
                  $this->_redirectUrl($url);
              }
-            $this->cleaningAfterSuccess();
         } else {
             if ($this->getRequest()->isXmlHttpRequest()) {
                 $this->getResponse()->setBody(Mage::helper('core')->jsonEncode(array(
@@ -210,10 +210,8 @@ class Touch_TouchPayment_IndexController extends Mage_Core_Controller_Front_Acti
 
     private function cleaningAfterSuccess()
     {
-        $session = $this->_getCheckout();
-        if (isset($session['extension_days'])) {
-            unset($session['extension_days']);
-        }
+        $session = $this->getOnepage()->getCheckout();
+        $session->clear();
     }
 
     private function _getTouchStatus(Mage_Sales_Model_Order $order)
@@ -332,6 +330,15 @@ class Touch_TouchPayment_IndexController extends Mage_Core_Controller_Front_Acti
         } catch (Exception $e) {
             Mage::logException($e);
         }
+    }
+    /**
+     * Get one page checkout model
+     *
+     * @return Mage_Checkout_Model_Type_Onepage
+     */
+    public function getOnepage()
+    {
+        return Mage::getSingleton('checkout/type_onepage');
     }
 
     protected function _getCheckout()
