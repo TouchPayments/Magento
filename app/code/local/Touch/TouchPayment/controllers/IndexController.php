@@ -391,7 +391,6 @@ class Touch_TouchPayment_IndexController extends Mage_Core_Controller_Front_Acti
 
     public function errorAction()
     {
-        $request = $_REQUEST;
         $gotoSection = false;
         $session = $this->_getCheckout();
         if ($session->getLastRealOrderId()) {

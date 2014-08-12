@@ -129,4 +129,25 @@ class Touch_TouchPayment_Model_Api_Touch {
         return $response;
     }
 
+    /**
+     * Cancel order item
+     *
+     * @param $refNumber
+     * @param $itemIds
+     * @param $reason
+     *
+     * @return mixed
+     */
+    public function setOrderItemStatusCancelled($refNumber, $itemIds, $reason)
+    {
+        $response = $this->_touchClient->setOrderItemStatusCancelled($refNumber, $itemIds, $reason);
+        return $response;
+    }
+
+    public function getOrder($refNumber)
+    {
+        return $this->_touchClient->getOrder($refNumber);
+    }
+
+
 }

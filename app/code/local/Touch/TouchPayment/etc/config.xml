@@ -109,6 +109,17 @@
                     </sales_order_invoice_save_after>
                 </observers>
             </sales_order_invoice_save_after>
+            <!--
+                Handle order cancellation
+            -->
+            <sales_order_item_cancel>
+                <observers>
+                    <sales_order_item_cancel>
+                        <class>touch_touchpayment/observer</class>
+                        <method>cancelOrder</method>
+                    </sales_order_item_cancel>
+                </observers>
+            </sales_order_item_cancel>
         </events>
 
         <!-- declare resource setup for new module -->

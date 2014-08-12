@@ -68,31 +68,42 @@ class Touch_TouchPayment_Model_Observer {
         }
     }
 
-    public function autoCancelPendingOrders()
+    public function cancelOrder(Varien_Event_Observer $observer)
     {
-        $orderCollection = Mage::getResourceModel('sales/order_collection');
+        $item = $observer->getEvent()->getItem();
+        $order = $item->getOrder();
+        $payment = $order->getPayment();
+        $method = $payment->getMethod();
 
-        $orderCollection
-            ->addFieldToFilter('status', 'pending')
-            ->addFieldToFilter('state', 'new')
-            ->addFieldToFilter('created_at', array(
-                    'lt' =>  new Zend_Db_Expr("DATE_ADD('".now()."', INTERVAL -'60:00' HOUR_MINUTE)")))
-            ->addFieldToFilter('sales_flat_order_payment.method', Touch_TouchPayment_Model_Payment::METHOD_TOUCH)
-            ->getSelect()
-            ->join('sales_flat_order_payment', 'main_table.entity_id=sales_flat_order_payment.entity_id', false, null, 'inner')
-            ->limit(40);
+        if (in_array($method, array(Touch_TouchPayment_Model_Payment::METHOD_TOUCH, Touch_TouchPayment_Model_Express::METHOD_TOUCH))) {
 
-        foreach($orderCollection->getItems() as $order) {
+            $touchApi = new Touch_TouchPayment_Model_Api_Touch();
 
-            $orderModel = Mage::getModel('sales/order');
-            $orderModel->load($order['entity_id']);
+            $touchOrder = $touchApi->getOrder($order->getIncrementId());
+            if (isset($touchOrder->result)) {
+                $items = $touchOrder->result->items;
 
-            if ($orderModel->canCancel()) {
-                $orderModel->registerCancellation('Touch Payments - Order has timed out');
-                $orderModel->save();
+                foreach ($items as $touchItem) {
+
+                    if ($touchItem->sku == $item->getSku() && $touchItem->status != 'cancelled') {
+                        $response = $touchApi->setOrderItemStatusCancelled($order->getIncrementId(), array($touchItem->id), 'Manually cancelled from Magento');
+                        if (isset($response->error)) {
+                            $addMessage = 'Touch Payments couldn\'t set the order to cancelled. ';
+                            if (isset($response->error->message)) {
+                                $addMessage .= $response->error->message;
+                            }
+
+                            Mage::getSingleton('adminhtml/session')->addError($addMessage);
+                            throw new Exception($addMessage);
+                        }
+
+                        break;
+                    }
+                }
             }
-        }
 
+        }
+        return $this;
     }
 
 }
