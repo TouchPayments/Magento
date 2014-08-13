@@ -33,6 +33,7 @@ class Touch_TouchPayment_Model_Data_Helper
         $extensionDays = $session['extension_days'];
         $touchOrder->extendingDays = $extensionDays;
         $touchOrder->shippingMethods = array();
+        $touchOrder->clientSessionId = Mage::getSingleton("core/session")->getEncryptedSessionId();
 
         return $touchOrder;
     }
