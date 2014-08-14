@@ -64,8 +64,13 @@ class Touch_TouchPayment_Model_Data_Helper
         unset($touchOrder->shippingMethods);
 
         $touchOrder->grandTotal = $quote->getGrandTotal();
-        // @todo: Check if there's only one shipping method available then apply here
-        $touchOrder->shippingCosts = 0;
+
+        if ($quote->getShippingAddress()->getShippingInclTax() > 0) {
+            $touchOrder->shippingCosts = $quote->getShippingAddress()->getShippingInclTax();
+        } else {
+            $touchOrder->shippingCosts = 0;
+        }
+
         $touchOrder->gst = 0; // Not available at quote level, will be confirmed at a later stage
         $touchOrder->items = self::processItems($quote->getAllItems());
         $touchOrder->clientSessionId = Mage::getSingleton("core/session")->getEncryptedSessionId();
