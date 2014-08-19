@@ -1,7 +1,7 @@
 <?php
 /**
  * Touch Payments Order Object Class
- * 
+ *
  * @copyright 2013 Check'n Pay Finance Pty Limited
  */
 class Touch_Order extends Touch_Object {
@@ -15,6 +15,11 @@ class Touch_Order extends Touch_Object {
      * @var Float
      */
     public $shippingCosts;
+
+    /**
+     * @var Float
+     */
+    public $discount;
 
     /**
      * @var float
@@ -40,7 +45,7 @@ class Touch_Order extends Touch_Object {
      * @var Touch_Customer
      */
     public $customer;
-    
+
     /**
      * @var Int
      */

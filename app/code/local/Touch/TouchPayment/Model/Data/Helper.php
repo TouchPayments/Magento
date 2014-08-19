@@ -11,14 +11,32 @@ class Touch_TouchPayment_Model_Data_Helper
     public static function getTouchOrder(Mage_Sales_Model_Order $order)
     {
         $session = Mage::getSingleton('checkout/session');
+        $customerSession = Mage::getSingleton('customer/session');
 
         $customer = new Touch_Customer();
         $customer->email = $order->getCustomerEmail();
         $customer->firstName = $order->getCustomerFirstname();
         $customer->lastName = $order->getCustomerLastname();
 
-        $customer->telephoneMobile = $session['touchTelephone'];
-        $customer->dob = $session['touchDob'];
+
+        $customer->telephoneMobile = $session->getTouchTelephone();
+        $address = $session->getQuote()->getBillingAddress();
+
+        if($session->getDob()) {
+            $customer->dob = $session->getDob();
+        }
+        if(!$customer->dob && $address->getDob()) {
+            $customer->dob = $address->getDob();
+        }
+        if(!$customer->dob && $session->getQuote()->getDob()) {
+            $customer->dob = $session->getQuote()->getDob();
+        }
+        if(!$customer->dob && $customerSession->isLoggedIn()) {
+            $customer->dob = $customerSession->getCustomer()->getDob();
+        }
+        if(!$customer->dob && $order->getCustomerDob()) {
+            $customer->dob = $order->getCustomerDob();
+        }
 
         $touchOrder = new Touch_Order();
         $touchOrder->addressBilling = self::processAddress($order->getBillingAddress());
@@ -28,19 +46,19 @@ class Touch_TouchPayment_Model_Data_Helper
         $touchOrder->grandTotal = $grandTotal;
         $touchOrder->shippingCosts = $order->getShippingAmount();
         $touchOrder->gst = $order->getTaxAmount();
-        $touchOrder->items = self::processItems($order->getItemsCollection());
         $touchOrder->customer = $customer;
-        $extensionDays = $session['extension_days'];
+        $extensionDays = $session->getExtensionDays();
         $touchOrder->extendingDays = $extensionDays;
         $touchOrder->shippingMethods = array();
         $touchOrder->clientSessionId = Mage::getSingleton("core/session")->getEncryptedSessionId();
+        $touchOrder = self::processItems($order->getItemsCollection(), $touchOrder);
 
         return $touchOrder;
     }
 
     /**
-     *
      * @param Mage_Sales_Model_Order $order
+     * @return array
      */
     public static function getArticleLines(Mage_Sales_Model_Order $order)
     {
@@ -72,20 +90,25 @@ class Touch_TouchPayment_Model_Data_Helper
         }
 
         $touchOrder->gst = 0; // Not available at quote level, will be confirmed at a later stage
-        $touchOrder->items = self::processItems($quote->getAllItems());
         $touchOrder->clientSessionId = Mage::getSingleton("core/session")->getEncryptedSessionId();
+        $touchOrder = self::processItems($quote->getAllItems(), $touchOrder);
 
         return $touchOrder;
     }
 
-    protected static function processItems($items)
+    protected static function processItems($items, Touch_Order $order)
     {
         $touchItems = $processedItems = array();
+        $discount   = 0;
 
         foreach ($items as $item) {
             $sku = $item->getSku();
             $parent = $item->getParentItemId();
             $quantityHandler = $item instanceof Mage_Sales_Model_Quote_Item ? 'getQty' : 'getQtyOrdered';
+
+            if ($item->getDiscountAmount() > 0) {
+                $discount += $item->getDiscountAmount();
+            }
 
             // The collection could contain simple and configurable items with the same sku...
             if ($parent && !empty($processedItems[$parent]) && !empty($touchItems[$processedItems[$parent]])) {
@@ -117,7 +140,11 @@ class Touch_TouchPayment_Model_Data_Helper
                 $processedItems[$item->getItemId()] = $sku;
             }
         }
-        return $touchItems;
+
+        $order->items    = $touchItems;
+        $order->discount = $discount;
+
+        return $order;
     }
 
     protected static function processAddress($address)

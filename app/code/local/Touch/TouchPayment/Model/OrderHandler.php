@@ -2,6 +2,7 @@
 
 class Touch_TouchPayment_Model_OrderHandler extends Mage_Core_Model_Abstract
 {
+    private $_storeId = '1';
     private $_groupId = '1';
     private $_sendConfirmation = '0';
     private $orderData = array();
@@ -52,7 +53,6 @@ class Touch_TouchPayment_Model_OrderHandler extends Mage_Core_Model_Abstract
                 'method' => 'touch_touchexpress',
             ),
             'order'        => array(
-                'increment_id'      => $quote->reserved_order_id,
                 'currency'          => Mage::app()->getStore($quote->getStoreId())->getCurrentCurrencyCode(),
                 'account'           => array(
                     'group_id' => $this->_groupId,
@@ -168,14 +168,11 @@ class Touch_TouchPayment_Model_OrderHandler extends Mage_Core_Model_Abstract
                 Mage::unregister('rule_data');
                 return $_order;
             } catch (Exception $e) {
-                var_dump($e->getMessage());
-                Mage::log("TouchPayment: Order save error...");
-                exit($e->getTraceAsString());
+                Mage::log("Order save error...");
             }
         }
         return null;
     }
-
 
     protected function _processQuote($data = array())
     {
