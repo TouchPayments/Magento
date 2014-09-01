@@ -19,12 +19,15 @@ class Touch_TouchPayment_Model_Data_Helper
         $customer->lastName = $order->getCustomerLastname();
 
 
-        $customer->telephoneMobile = $session->getTouchTelephone();
+        $customer->telephoneMobile = $session->getData('touchTelephone');
         $address = $session->getQuote()->getBillingAddress();
 
         if($session->getDob()) {
             $customer->dob = $session->getDob();
+        } elseif ($session->getData('touchDob')) {
+            $customer->dob = $session->getData('touchDob');
         }
+
         if(!$customer->dob && $address->getDob()) {
             $customer->dob = $address->getDob();
         }
