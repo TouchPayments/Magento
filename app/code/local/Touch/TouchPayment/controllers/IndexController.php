@@ -159,6 +159,40 @@ class Touch_TouchPayment_IndexController extends Mage_Core_Controller_Front_Acti
         $this->renderLayout();
     }
 
+    public function holdAction()
+    {
+        $token = $this->getRequest()->getParam('token');
+        $order = Mage::getModel('sales/order')->loadByAttribute('touch_token', $token);
+
+        if ($order) {
+            $order->setStatus('touch_payments_hold');
+            $order->setState('touch_payments_hold');
+
+            $order->save();
+
+            exit(json_encode(array('status' => 'success')));
+        }
+
+        else exit(json_encode(array('status' => 'error')));
+    }
+
+    public function releaseAction()
+    {
+        $token = $this->getRequest()->getParam('token');
+        $order = Mage::getModel('sales/order')->loadByAttribute('touch_token', $token);
+
+        if ($order) {
+            $status = Mage::getStoreConfig('payment/touch_touchpayment/order_status');
+            $order->setStatus($status);
+            $order->setState('processing');
+
+            $order->save();
+
+            exit(json_encode(array('status' => 'success')));
+        }
+
+        else exit(json_encode(array('status' => 'error')));
+    }
 
     private function _handleTouchApprovalResponse(Mage_Sales_Model_Order $order, $apprReturn)
     {
