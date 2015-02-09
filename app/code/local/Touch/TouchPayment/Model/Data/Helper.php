@@ -56,6 +56,10 @@ class Touch_TouchPayment_Model_Data_Helper
         $touchOrder->clientSessionId = Mage::getSingleton("core/session")->getEncryptedSessionId();
         $touchOrder = self::processItems($order->getItemsCollection(), $touchOrder);
 
+        if ($order->getGiftCardsAmount()) {
+            $touchOrder->discount += $order->getGiftCardsAmount();
+        }
+
         return $touchOrder;
     }
 
@@ -95,6 +99,10 @@ class Touch_TouchPayment_Model_Data_Helper
         $touchOrder->gst = 0; // Not available at quote level, will be confirmed at a later stage
         $touchOrder->clientSessionId = Mage::getSingleton("core/session")->getEncryptedSessionId();
         $touchOrder = self::processItems($quote->getAllItems(), $touchOrder);
+
+        if ($quote->getGiftCardsAmount()) {
+            $touchOrder->discount += $quote->getGiftCardsAmount();
+        }
 
         return $touchOrder;
     }
