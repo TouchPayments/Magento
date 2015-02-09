@@ -99,6 +99,19 @@ class Touch_TouchPayment_Model_OrderHandler extends Mage_Core_Model_Abstract
                 'send_confirmation' => $this->_sendConfirmation
             ),
         );
+
+        // Modifying shipping address in quote so it is marked as different from billing if that's the case
+        if ($sourceOrder['addressBilling']['addressOne'] != $sourceOrder['addressShipping']['addressOne'] ||
+            $sourceOrder['addressBilling']['addressTwo'] != $sourceOrder['addressShipping']['addressTwo'] ||
+            $sourceOrder['addressBilling']['suburb'] != $sourceOrder['addressShipping']['suburb'] ||
+            $sourceOrder['addressBilling']['postcode'] != $sourceOrder['addressShipping']['postcode'] ||
+            $sourceOrder['addressBilling']['idState'] != $sourceOrder['addressShipping']['idState'] ||
+            $sourceOrder['addressBilling']['idCountry'] != $sourceOrder['addressShipping']['idCountry']) {
+
+            $shippingAddress = $quote->getShippingAddress();
+            $shippingAddress->setSameAsBilling(false);
+            $shippingAddress->save();
+        }
     }
 
     /**

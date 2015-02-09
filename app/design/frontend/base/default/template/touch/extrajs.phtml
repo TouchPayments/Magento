@@ -1,11 +1,5 @@
 <?php echo $this->getCssJsHtml();
 
-/**
- *  quick and dirty solution
- *  this should come from the controller at least
- *  but we don't know yet how to do that so lets do
- *  it here for now
- */
 $service = new Touch_TouchPayment_Model_Api_Touch();
 $js = $service->getJavascriptSources(Mage::getSingleton("core/session")->getEncryptedSessionId());
 echo '<script type="text/javascript" src="'.$js->result->url.'"></script>';

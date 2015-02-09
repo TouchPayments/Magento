@@ -43,8 +43,8 @@ class Touch_TouchPayment_Block_Form_Pay extends Mage_Payment_Block_Form
 
     public function getOrderData()
     {
-        $session = Mage::getSingleton('checkout/session');
-        $address = $session->getQuote()->getBillingAddress();
+        $session      = Mage::getSingleton('checkout/session');
+        $address      = $session->getQuote()->getBillingAddress();
         $touchSession = Mage::getSingleton("core/session", array("name" => "frontend"));
 
         if ($address->getEmail() && !$touchSession->getData('touch_customer')) {
@@ -52,8 +52,17 @@ class Touch_TouchPayment_Block_Form_Pay extends Mage_Payment_Block_Form
             $touchSession->setData('touch_customer', $address->getEmail());
         }
 
-        $this->initialDelay = $this->_touchClient->getInitialPaymentDelayDuration()->result;
-        $this->extensions = $this->_touchClient->getExtensions()->result;
+        if (!$touchSession->getData('initial_delay')) {
+            $touchSession->setData('initial_delay', $this->_touchClient->getInitialPaymentDelayDuration()->result);
+        }
+
+        $this->initialDelay = $touchSession->getData('initial_delay');
+
+        if (!$touchSession->getData('extensions')) {
+            $touchSession->setData('extensions', serialize($this->_touchClient->getExtensions()->result));
+        }
+
+        $this->extensions = unserialize($touchSession->getData('extensions'));
 
         if ($customer instanceof Touch_Customer) {
             $this->telephoneMobile = $customer->telephoneMobile;
