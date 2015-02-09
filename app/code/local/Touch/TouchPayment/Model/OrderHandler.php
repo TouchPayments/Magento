@@ -181,7 +181,7 @@ class Touch_TouchPayment_Model_OrderHandler extends Mage_Core_Model_Abstract
                 Mage::unregister('rule_data');
                 return $_order;
             } catch (Exception $e) {
-                Mage::log("Order save error...");
+                return $e->getMessage();
             }
         }
         return null;

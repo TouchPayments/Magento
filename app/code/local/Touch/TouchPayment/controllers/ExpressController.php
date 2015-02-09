@@ -108,12 +108,16 @@ class Touch_TouchPayment_ExpressController extends Mage_Core_Controller_Front_Ac
         try {
             $order = new Touch_TouchPayment_Model_OrderHandler();
             $order->generateOrder($orderApi, $quote);
-            $order->create();
+            $o = $order->create();
         } catch (Exception $e) {
             exit (json_encode(array('status' => 'error', 'message' => $e->getMessage())));
         }
 
-        exit(json_encode(array('status' => 'success')));
+        if ($o instanceof Mage_Sales_Model_Order) {
+            exit(json_encode(array('status' => 'success')));
+        } else {
+            exit(json_encode(array('status' => 'error', 'message' => $o)));
+        }
     }
 
     protected function respondWithSuccess($data)
