@@ -1,12 +1,12 @@
 <?php
 /**
  * Touch Payments Item Class
- * 
+ *
  * @copyright 2013 Check'n Pay Finance Pty Limited
  */
 class Touch_Item extends Touch_Object {
 
-    
+
     const STATUS_ACTIVE = 'active';
     const STATUS_ACTIVEDUE = 'activeDue';
     const STATUS_APPROVED = 'approved';
@@ -25,7 +25,7 @@ class Touch_Item extends Touch_Object {
     const STATUS_RETURNEDAFTERPAYMENT = 'returnedAfterPayment';
     const STATUS_SHIPPED = 'shipped';
     const STATUS_UNABLETOFULLFILL = 'unableToFullFill';
-    
+
     /**
      * @var String
      */
@@ -40,16 +40,25 @@ class Touch_Item extends Touch_Object {
      * @var String
      */
     public $description;
-    
+
     /**
      * @var int
      */
     public $quantity;
-    
+
     /**
      * @var string
      */
     public $image;
-    
+
+    /**
+     * @var string
+     */
+    public $customLabel;
+
+    /**
+     * @var string
+     */
+    public $customValue;
 
 }

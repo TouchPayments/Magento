@@ -120,6 +120,10 @@ class Touch_TouchPayment_Model_Express extends Mage_Payment_Model_Method_Abstrac
      */
     public function isAvailable($quote = null)
     {
+        if (!parent::isAvailable($quote)) {
+            return false;
+        }
+
         if (!$quote) {
             $quote = Mage::getModel('sales/quote')->load(Mage::getSingleton('checkout/session')->getQuoteId());
         }
@@ -133,8 +137,7 @@ class Touch_TouchPayment_Model_Express extends Mage_Payment_Model_Method_Abstrac
             return false;
         }
 
-        $touchApi = new Touch_TouchPayment_Model_Api_Touch();
-        return $touchApi->isApiActive();
+        return true;
     }
 
     /**

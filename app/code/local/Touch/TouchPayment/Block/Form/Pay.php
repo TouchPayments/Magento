@@ -45,8 +45,12 @@ class Touch_TouchPayment_Block_Form_Pay extends Mage_Payment_Block_Form
     {
         $session = Mage::getSingleton('checkout/session');
         $address = $session->getQuote()->getBillingAddress();
+        $touchSession = Mage::getSingleton("core/session", array("name" => "frontend"));
 
-        $customer = $this->_touchClient->getCustomer($address->getEmail());
+        if ($address->getEmail() && !$touchSession->getData('touch_customer')) {
+            $customer = $this->_touchClient->getCustomer($address->getEmail());
+            $touchSession->setData('touch_customer', $address->getEmail());
+        }
 
         $this->initialDelay = $this->_touchClient->getInitialPaymentDelayDuration()->result;
         $this->extensions = $this->_touchClient->getExtensions()->result;

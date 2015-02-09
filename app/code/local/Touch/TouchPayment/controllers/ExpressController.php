@@ -11,6 +11,11 @@ class Touch_TouchPayment_ExpressController extends Mage_Core_Controller_Front_Ac
         switch ($this->getRequest()->getParam('do')) {
             case 'generate-order':
                 $quote      = Mage::getModel('checkout/cart')->getQuote();
+
+                if (!count($quote->getAllItems())) {
+                    exit(json_encode(array('status' => 'error', 'redirect' => '/checkout/cart')));
+                }
+
                 $touchOrder = Touch_TouchPayment_Model_Data_Helper::getTouchOrderFromQuote($quote);
                 $touchApi   = new Touch_TouchPayment_Model_Api_Touch();
 
@@ -23,6 +28,8 @@ class Touch_TouchPayment_ExpressController extends Mage_Core_Controller_Front_Ac
                     $this->respondWithSuccess($response->result);
                 }
                 break;
+
+
             case 'get-shipping-methods':
 
                 $this->handleShippingMethodsRequest();

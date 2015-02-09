@@ -169,13 +169,16 @@ class Touch_TouchPayment_Model_Payment extends Mage_Payment_Model_Method_Abstrac
      */
     public function isAvailable($quote = null)
     {
+        if (!parent::isAvailable($quote)) {
+            return false;
+        }
+
         // Is the module active?
         if (!$this->getConfigData('active')) {
             return false;
         }
 
-        $touchApi = new Touch_TouchPayment_Model_Api_Touch();
-        return $touchApi->isApiActive();
+        return true;
     }
 
     /**

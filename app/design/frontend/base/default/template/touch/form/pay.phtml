@@ -9,9 +9,9 @@
             <ul class="form-list">
                 <li class="fields">
                     <div class="field">
-                        <label for="payment:mobile" class="required"><em>*</em><?php echo $this->__('Telephone') ?></label>
+                        <label for="payment:mobile" class="required"><em>*</em><?php echo $this->__('Mobile Telephone Number') ?></label>
                         <div class="input-box">
-                            <input type="text" id="payment:mobile" name="payment[mobile]" value="<?= $this->telephoneMobile; ?>" title="<?php echo $this->__('Telephone') ?>" class="input-text required-entry" />
+                            <input type="text" id="payment:mobile" name="payment[mobile]" value="<?= $this->telephoneMobile; ?>" title="<?php echo $this->__('Telephone') ?>" class="input-text required-entry  validate-mobile" />
                         </div>
                     </div>
                     <div class="field">
@@ -21,20 +21,19 @@
                         </div>
                     </div>
                     <?php
-                    if (count($this->extensions)):
-    ?>
+                    if (count($this->extensions)): ?>
                         <div class="field">
-                                    <label for="payment:extension_days"><?php echo $this->__('When would you like to pay?') ?></label>
-                                <div class="input-box">
-                                    <select name="payment[extension_days]" id="payment:extension_days" title="<?php echo $this->__('Extension') ?>">
-                                        <option value="0">Up to <?= $this->initialDelay ?> days - Free</option>
-                                            <?php foreach ($this->extensions as $extension): ?>
+                            <label for="payment:extension_days"><?php echo $this->__('When would you like to pay?') ?></label>
+                            <div class="input-box">
+                                <select name="payment[extension_days]" id="payment:extension_days" title="<?php echo $this->__('Extension') ?>">
+                                    <option value="0">Up to <?= $this->initialDelay ?> days - Free</option>
+                                    <?php foreach ($this->extensions as $extension): ?>
                                         <option value="<?= $extension->days ?>">Up to <?= $this->initialDelay + $extension->days ?> days - $<?= $extension->amount ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
+                                    <?php endforeach; ?>
+                                </select>
                             </div>
-<?php endif; ?>
+                        </div>
+                    <?php endif; ?>
                 </li>
             </ul>
         </fieldset>
@@ -44,4 +43,16 @@
     <?php echo $this->getMethod()->getConfigData('message');?>
 </div>
 
+<script type="text/javascript">
+    //<![CDATA[
+    var dataForm = new VarienForm('co-payment-form', true);
 
+    Validation.add('validate-mobile', 'Please enter a valid Australian mobile number.', function(the_field_value) {
+        if (the_field_value && the_field_value.match(/^(?:(\+|00)?61|0)[45](?: ?[0-9]){8}$/)) {
+            return true;
+        } else {
+            return false;
+        }
+    });
+    //]]>
+</script>

@@ -66,7 +66,7 @@ Ajax.Responders.register({
 // ----- Touch Payments promotional material
 
 function isiOS() {
-    return navigator.userAgent.match(/(iPhone|iPod|iPad)/g) ? true : false;
+    return navigator.userAgent.match(/(iPhone|iPod|iPad|Android)/g) ? true : false;
 }
 
 var touchModal = new Control.Modal($('modal'),{
@@ -76,20 +76,21 @@ var touchModal = new Control.Modal($('modal'),{
     closeOnClick: true
 });
 
-var iframeHeight = 800;
+var iframeHeight = 800,
+    iframeWidth = 400,
+    loaded = false;
 
 
 if (isiOS()) {
     if (screen.width < 400) {
         iframeHeight = 1050;
+        iframeWidth = 360;
     } else {
         iframeHeight = 900;
     }
 }
 
-touchModal.container.insert('<iframe src="http://www.touchpayments.com.au/what-is-touch?closable=true&type=express" width="400" height="' + iframeHeight + '"></iframe>');
-
-$$('.touch-cart-banner,.touch-product-banner').each(function(element) {
+$$('.touch-cart-banner,.touch-product-banner,.what-is-touch').each(function(element) {
     element.observe('click', function(e) {
         if (isiOS()) {
             window.scrollTo(0,0);
@@ -97,6 +98,11 @@ $$('.touch-cart-banner,.touch-product-banner').each(function(element) {
             $$('.touch-modal').each(function(element) {
                 element.style.position = 'fixed';
             });
+        }
+
+        if (!loaded) {
+            touchModal.container.insert('<iframe src="https://app.touchpayments.com.au/index/howto?type=express" width="' + iframeWidth + '" height="' + iframeHeight + '"></iframe>');
+            loaded = true;
         }
 
         touchModal.open();
