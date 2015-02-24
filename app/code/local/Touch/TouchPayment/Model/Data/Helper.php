@@ -159,7 +159,7 @@ class Touch_TouchPayment_Model_Data_Helper
                 }
 
                 if ($item->getDiscountAmount()) {
-                    $touchItem->pricePaid -= $item->getDiscountAmount();
+                    $touchItem->pricePaid -= $item->getDiscountAmount() / $item->{$quantityHandler}();
                 }
 
                 if ($item->getGwPrice()) {
@@ -188,7 +188,7 @@ class Touch_TouchPayment_Model_Data_Helper
                 $processedItems[$item->getItemId()] = $sku;
 
                 if ($item->getDiscountAmount()) {
-                    $touchItem->pricePaid -= $item->getDiscountAmount();
+                    $touchItem->pricePaid -= $item->getDiscountAmount() / $item->{$quantityHandler}();
                 }
 
                 if ($item->getGwPrice()) {
