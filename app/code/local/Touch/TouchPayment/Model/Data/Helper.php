@@ -17,7 +17,7 @@ class Touch_TouchPayment_Model_Data_Helper
         $customer->email = $order->getCustomerEmail();
         $customer->firstName = $order->getCustomerFirstname();
         $customer->lastName = $order->getCustomerLastname();
-
+        $customer->isReturning = self::isReturning($order->getCustomerEmail(), 1);
 
         $customer->telephoneMobile = $session->getData('touchTelephone');
         $address = $session->getQuote()->getBillingAddress();
@@ -55,6 +55,19 @@ class Touch_TouchPayment_Model_Data_Helper
         $touchOrder->shippingMethods = array();
         $touchOrder->clientSessionId = Mage::getSingleton("core/session")->getEncryptedSessionId();
         $touchOrder = self::processItems($order->getItemsCollection(), $touchOrder);
+
+        if ($order->getGwPrice()) {
+            // Gift wrap at the order level. TP API only allows at item level, so just assign to the first item
+            reset($touchOrder->items);
+            $key = key($touchOrder->items);
+
+            $item = $touchOrder->items[$key];
+
+            $item->pricePaid += $order->getGwPrice();
+            $item->giftWrapPrice = $order->getGwPrice();
+
+            $touchOrder->items[$key] = $item;
+        }
 
         if ($order->getGiftCardsAmount()) {
             $touchOrder->discount += $order->getGiftCardsAmount();
@@ -104,6 +117,19 @@ class Touch_TouchPayment_Model_Data_Helper
             $touchOrder->discount += $quote->getGiftCardsAmount();
         }
 
+        if ($quote->getGwPrice()) {
+            // Gift wrap at the order level. TP API only allows at item level, so just assign to the first item
+            reset($touchOrder->items);
+            $key = key($touchOrder->items);
+
+            $item = $touchOrder->items[$key];
+
+            $item->pricePaid += $quote->getGwPrice();
+            $item->giftWrapPrice = $quote->getGwPrice();
+
+            $touchOrder->items[$key] = $item;
+        }
+
         return $touchOrder;
     }
 
@@ -128,7 +154,17 @@ class Touch_TouchPayment_Model_Data_Helper
                 $touchItem->sku = $sku;
 
                 if ($item->getPriceInclTax() && $item->getPriceInclTax() != $touchItem->price) {
-                    $touchItem->price = $item->getPriceInclTax();
+                    $touchItem->price     = $item->getPriceInclTax();
+                    $touchItem->pricePaid = $item->getPriceInclTax();
+                }
+
+                if ($item->getDiscountAmount()) {
+                    $touchItem->pricePaid -= $item->getDiscountAmount();
+                }
+
+                if ($item->getGwPrice()) {
+                    $touchItem->giftWrapPrice = $item->getGwPrice();
+                    $touchItem->pricePaid += $item->getGwPrice();
                 }
 
                 if ($item->{$quantityHandler}() && $item->{$quantityHandler}() >= $touchItem->quantity) {
@@ -147,8 +183,18 @@ class Touch_TouchPayment_Model_Data_Helper
                 $touchItem->quantity = $item->{$quantityHandler}();
                 $touchItem->description = $item->getName() . ' ' . (string)$item->getGiftMessageAvailable();
                 $touchItem->price = $item->getPriceInclTax();
+                $touchItem->pricePaid = $item->getPriceInclTax();
                 $touchItems[$sku] = $touchItem;
                 $processedItems[$item->getItemId()] = $sku;
+
+                if ($item->getDiscountAmount()) {
+                    $touchItem->pricePaid -= $item->getDiscountAmount();
+                }
+
+                if ($item->getGwPrice()) {
+                    $touchItem->giftWrapPrice = $item->getGwPrice();
+                    $touchItem->pricePaid += $item->getGwPrice();
+                }
             }
         }
 
@@ -214,5 +260,14 @@ class Touch_TouchPayment_Model_Data_Helper
         $str = mb_strtolower($str);
         // Replace not word class char by void
         return preg_replace('/[^a-z]/', '', $str);
+    }
+
+    protected static function isReturning($email, $count = 0)
+    {
+        $orders = Mage::getResourceModel('sales/order_collection')
+            ->addFieldToSelect('customer_email')
+            ->addFieldToFilter('customer_email', $email);
+
+        return count($orders) > $count;
     }
 }

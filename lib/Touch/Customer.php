@@ -36,4 +36,9 @@ class Touch_Customer extends Touch_Object {
      */
     public $dob;
 
+    /**
+     * @var boolean
+     */
+    public $isReturning;
+
 }

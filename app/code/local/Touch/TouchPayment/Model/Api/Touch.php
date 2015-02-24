@@ -149,5 +149,9 @@ class Touch_TouchPayment_Model_Api_Touch {
         return $this->_touchClient->getOrder($refNumber);
     }
 
-
+    public function setOrderItemStatusShipped($refNumber, $itemIds)
+    {
+        $response = $this->_touchClient->setOrderItemStatusShipped($refNumber, $itemIds);
+        return $response;
+    }
 }

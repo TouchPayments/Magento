@@ -37,6 +37,21 @@ class Touch_Item extends Touch_Object {
     public $price;
 
     /**
+     * @var Float
+     */
+    public $pricePaid;
+
+    /**
+     * @var Float
+     */
+    public $giftWrapPrice;
+
+    /**
+     * @var boolean
+     */
+    public $onSale;
+
+    /**
      * @var String
      */
     public $description;

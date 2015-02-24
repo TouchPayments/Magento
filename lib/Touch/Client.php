@@ -103,8 +103,22 @@ class Touch_Client {
      */
     public function setOrderItemStatusReturnPending($refNr, $itemIds)
     {
-        $data = array($this->_apiKey, $refNr ,$itemIds);
+        $data = array($this->_apiKey, $refNr, $itemIds);
         return $this->_callMethod('setOrderItemStatusReturnPending', $data);
+    }
+
+    /**
+     * set order item to shipped
+     *
+     * @param $refNr
+     * @param $itemIds
+     *
+     * @return string
+     */
+    public function setOrderItemStatusShipped($refNr, $itemIds)
+    {
+        $data = array($this->_apiKey, $refNr, $itemIds);
+        return $this->_callMethod('setOrderItemStatusShipped', $data);
     }
 
     /**
@@ -114,10 +128,10 @@ class Touch_Client {
      * @param mixed $itemIds
      * @return mixed
      */
-    public function setOrderItemStatusReturneDenied($refNr, $itemIds)
+    public function setOrderItemStatusReturnDenied($refNr, $itemIds)
     {
         $data = array($this->_apiKey, $refNr ,$itemIds);
-        return $this->_callMethod('setOrderItemStatusReturneDenied', $data);
+        return $this->_callMethod('setOrderItemStatusReturnDenied', $data);
     }
 
 

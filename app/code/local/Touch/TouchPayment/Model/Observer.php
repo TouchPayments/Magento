@@ -22,20 +22,48 @@ class Touch_TouchPayment_Model_Observer {
         $payment = $order->getPayment();
         $method = $payment->getMethod();
 
-        if (in_array($method, array(Touch_TouchPayment_Model_Payment::METHOD_TOUCH, Touch_TouchPayment_Model_Express::METHOD_TOUCH))) {
+        if (in_array(
+            $method,
+            array(Touch_TouchPayment_Model_Payment::METHOD_TOUCH, Touch_TouchPayment_Model_Express::METHOD_TOUCH)
+        )
+        ) {
+            $touchApi  = new Touch_TouchPayment_Model_Api_Touch();
+            $items     = $shipment->getItemsCollection();
+            $response  = $touchApi->getOrder($order->getIncrementId());
 
-            $touchApi = new Touch_TouchPayment_Model_Api_Touch();
-            $response = $touchApi->setOrderItemsShipped($order->getIncrementId());
-            if (isset($response->error)) {
-                $addMessage = 'Touch Payments couldn\'t set the order to shipped. ';
-                if (isset($response->error->message)) {
-                    $addMessage .= $response->error->message;
+            if (!empty($response->result)) {
+                $shippableItems = $this->getShippableItems($response->result);
+                $ids = array();
+
+                foreach ($items as $item) {
+                    if ($item->getQty()) {
+                        for ($i = 0; $i < $item->getQty(); $i++) {
+                            if (!empty($shippableItems[$item->getSku()]) && !empty($shippableItems[$item->getSku()][$i])) {
+                                $ids[] = $shippableItems[$item->getSku()][$i];
+                            } else {
+                                $addMessage = 'Touch Payments couldn\'t set the order to shipped. One or more items are not actionable to be set as shipped.';
+                                Mage::getSingleton('adminhtml/session')->addError($addMessage);
+                                throw new Exception($addMessage);
+                            }
+                        }
+                    }
                 }
 
-                Mage::getSingleton('adminhtml/session')->addError($addMessage);
-                throw new Exception($addMessage);
-            }
+                if (count($ids)) {
+                    $response = $touchApi->setOrderItemStatusShipped($order->getIncrementId(), $ids);
 
+                    if (isset($response->error)) {
+                        $addMessage = 'Touch Payments couldn\'t set the order to shipped. ';
+                        if (isset($response->error->message)) {
+                            $addMessage .= $response->error->message;
+                        }
+
+                        Mage::getSingleton('adminhtml/session')->addError($addMessage);
+                        throw new Exception($addMessage);
+                    }
+                }
+
+            }
         }
         return $this;
     }
@@ -133,4 +161,21 @@ class Touch_TouchPayment_Model_Observer {
         return $this;
     }
 
+    protected function getShippableItems($touchOrder)
+    {
+        $shippable = array();
+
+        foreach ($touchOrder->items as $item) {
+            if ($item->status == 'approved') {
+                if (empty($shippable[$item->sku])) {
+                    $shippable[$item->sku] = array($item->id);
+                } else {
+                    $shippable[$item->sku][] = $item->id;
+                }
+            }
+        }
+
+        return $shippable;
+
+    }
 }
