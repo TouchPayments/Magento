@@ -12,7 +12,7 @@
                     <!-- do not show this configuration options in store scope -->
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
-                    <show_in_store>0</show_in_store>
+                    <show_in_store>1</show_in_store>
                     <fields>
                         <!-- is this payment method active for the website? -->
                         <active translate="label">
@@ -27,7 +27,7 @@
                             <!-- do not show this field in store scope -->
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
-                            <show_in_store>0</show_in_store>
+                            <show_in_store>1</show_in_store>
                         </active>
                         <order_status translate="label">
                             <label>New order status</label>
@@ -36,7 +36,7 @@
                             <sort_order>4</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
-                            <show_in_store>0</show_in_store>
+                            <show_in_store>1</show_in_store>
                         </order_status>
                         <api_url translate="label">
                             <label>API Url</label>
@@ -44,7 +44,7 @@
                             <sort_order>2</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
-                            <show_in_store>0</show_in_store>
+                            <show_in_store>1</show_in_store>
                         </api_url>
                         <api_key translate="label">
                             <label>API Key</label>
@@ -52,7 +52,7 @@
                             <sort_order>3</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
-                            <show_in_store>0</show_in_store>
+                            <show_in_store>1</show_in_store>
                         </api_key>
                         <redirect_url translate="label">
                             <label>Touch redirect Url</label>
@@ -60,7 +60,7 @@
                             <sort_order>4</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
-                            <show_in_store>0</show_in_store>
+                            <show_in_store>1</show_in_store>
                         </redirect_url>
                         <sort_order translate="label">
                             <label>Sort Order</label>
@@ -68,7 +68,7 @@
                             <sort_order>5</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
-                            <show_in_store>0</show_in_store>
+                            <show_in_store>1</show_in_store>
                         </sort_order>
                     </fields>
                 </touch_touchpayment>
@@ -77,7 +77,7 @@
                     <sort_order>680</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
-                    <show_in_store>0</show_in_store>
+                    <show_in_store>1</show_in_store>
                     <fields>
                         <active translate="label">
                             <label>Enabled</label>
@@ -86,7 +86,7 @@
                             <sort_order>1</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
-                            <show_in_store>0</show_in_store>
+                            <show_in_store>1</show_in_store>
                         </active>
                         <test_mode translate="label">
                             <label>Test Mode</label>
@@ -95,7 +95,7 @@
                             <sort_order>2</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
-                            <show_in_store>0</show_in_store>
+                            <show_in_store>1</show_in_store>
                         </test_mode>
                         <order_status translate="label">
                             <label>New order status</label>
@@ -104,7 +104,7 @@
                             <sort_order>4</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
-                            <show_in_store>0</show_in_store>
+                            <show_in_store>1</show_in_store>
                         </order_status>
                         <api_url translate="label">
                             <label>API Url</label>
@@ -112,7 +112,7 @@
                             <sort_order>3</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
-                            <show_in_store>0</show_in_store>
+                            <show_in_store>1</show_in_store>
                         </api_url>
                         <max_cart translate="label">
                             <label>Maximum Cart Amount Allowed</label>
@@ -120,7 +120,7 @@
                             <sort_order>5</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
-                            <show_in_store>0</show_in_store>
+                            <show_in_store>1</show_in_store>
                         </max_cart>
                     </fields>
                 </touch_touchexpress>
