@@ -70,7 +70,7 @@ class Touch_TouchPayment_Model_Data_Helper
         }
 
         if ($order->getGiftCardsAmount()) {
-            $touchOrder->discount += $order->getGiftCardsAmount();
+            $touchOrder->giftCardAmount = $order->getGiftCardsAmount();
         }
 
         return $touchOrder;
@@ -114,7 +114,7 @@ class Touch_TouchPayment_Model_Data_Helper
         $touchOrder = self::processItems($quote->getAllItems(), $touchOrder);
 
         if ($quote->getGiftCardsAmount()) {
-            $touchOrder->discount += $quote->getGiftCardsAmount();
+            $touchOrder->giftCardAmount = $quote->getGiftCardsAmount();
         }
 
         if ($quote->getGwPrice()) {
