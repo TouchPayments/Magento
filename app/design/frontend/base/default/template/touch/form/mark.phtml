@@ -1,5 +1,4 @@
 <?php // Touch Payments watermark ?>
 
 <img src="<?php echo $this->getSkinUrl('images/touchpayments/logo.png')?>" alt="Touch Payments" class="v-middle" width="123" height="34" />
-<a href="http://www.touchpayments.com.au/what-is-touch?merchant=<?= urlencode(Mage::app()->getStore()->getName()); ?>" onclick="javascript:window.open('http://www.touchpayments.com.au/what-is-touch?merchant=<?= urlencode(Mage::app()->getStore()->getName()); ?>','TouchPayments','toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=yes, ,left=0, top=0, width=800, height=600'); return false;">What is Touch Payments?</a>
-
+<span style="text-decoration: underline;cursor: pointer;" class="what-is-touch">What is Touch Payments?</span>

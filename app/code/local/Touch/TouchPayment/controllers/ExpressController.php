@@ -114,10 +114,10 @@ class Touch_TouchPayment_ExpressController extends Mage_Core_Controller_Front_Ac
                 ->addFieldToSelect('customer_email')
                 ->addFieldToFilter('customer_email', $email);
 
-            exit(json_encode(['existing' => (count($orders) ? true : false)]));
+            exit(json_encode(array('existing' => (count($orders) ? true : false))));
         }
 
-        exit(json_encode(['existing' => false]));
+        exit(json_encode(array('existing' => false)));
     }
 
     protected function handleSaveOrderRequest()

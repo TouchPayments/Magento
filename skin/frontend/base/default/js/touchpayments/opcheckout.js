@@ -90,12 +90,13 @@ if (isiOS()) {
     }
 }
 
-$$('.touch-cart-banner,.touch-product-banner,.what-is-touch').each(function(element) {
-    element.observe('click', function(e) {
+document.observe('click', function(e, el) {
+    if (e.findElement('.touch-cart-banner,.touch-product-banner,.what-is-touch')) {
+
         if (isiOS()) {
-            window.scrollTo(0,0);
+            window.scrollTo(0, 0);
         } else {
-            $$('.touch-modal').each(function(element) {
+            $$('.touch-modal').each(function (element) {
                 element.style.position = 'fixed';
             });
         }
@@ -106,7 +107,7 @@ $$('.touch-cart-banner,.touch-product-banner,.what-is-touch').each(function(elem
         }
 
         touchModal.open();
-    });
+    }
 });
 
 window.addEventListener("message", function (e) {

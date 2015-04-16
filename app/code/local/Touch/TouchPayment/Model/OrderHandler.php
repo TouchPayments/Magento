@@ -197,16 +197,10 @@ class Touch_TouchPayment_Model_OrderHandler extends Mage_Core_Model_Abstract
             $model->importPostData($data['order']);
         }
 
-
-        /* Just like adding products from Magento admin grid */
-//        if (!empty($data['add_products'])) {
-//            $model->addProducts($data['add_products']);
-//        }
-
         /* Collect shipping rates */
         $model->collectShippingRates();
-        /* Add payment data */
 
+        /* Add payment data */
         if (!empty($data['payment'])) {
             $model->getQuote()->getPayment()->addData($data['payment']);
         }

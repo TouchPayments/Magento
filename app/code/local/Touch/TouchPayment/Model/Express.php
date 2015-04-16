@@ -133,10 +133,6 @@ class Touch_TouchPayment_Model_Express extends Mage_Payment_Model_Method_Abstrac
             return false;
         }
 
-        if ($quote->getGrandTotal() > $this->getConfigData('max_cart')) {
-            return false;
-        }
-
         return true;
     }
 
