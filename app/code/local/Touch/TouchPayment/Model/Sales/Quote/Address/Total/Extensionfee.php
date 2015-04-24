@@ -96,7 +96,7 @@ class Touch_TouchPayment_Model_Sales_Quote_Address_Total_Extensionfee extends Ma
         if (!empty($amt) && $amt > 0) {
             $address->addTotal(array(
                 'code'=>$this->getCode(),
-                'title' => 'Touch Extension Fee', //Mage::helper($this->_code)->__('Fee'),
+                'title' => 'Touch Payments Extension Fee', //Mage::helper($this->_code)->__('Fee'),
                 'value' => $amt
             ));
         }
