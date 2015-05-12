@@ -39,6 +39,11 @@ class Touch_TouchPayment_ExpressController extends Mage_Core_Controller_Front_Ac
 
                 $this->handleSaveOrderRequest();
                 break;
+
+            case 'is-returning':
+
+                $this->handleIsReturningRequest();
+                break;
             default:
                 exit(json_encode(array('status' => 'error')));
         }
@@ -90,6 +95,21 @@ class Touch_TouchPayment_ExpressController extends Mage_Core_Controller_Front_Ac
         }
 
         exit;
+    }
+
+    protected function handleIsReturningRequest()
+    {
+        $email = $this->getRequest()->getParam('email');
+
+        if ($email) {
+            $orders = Mage::getResourceModel('sales/order_collection')
+                ->addFieldToSelect('customer_email')
+                ->addFieldToFilter('customer_email', $email);
+
+            exit(json_encode(array('existing' => (count($orders) ? count($orders) : false))));
+        }
+
+        exit(json_encode(array('existing' => false)));
     }
 
     protected function handleSaveOrderRequest()
