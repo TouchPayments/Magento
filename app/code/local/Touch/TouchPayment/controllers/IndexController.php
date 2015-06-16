@@ -141,7 +141,6 @@ class Touch_TouchPayment_IndexController extends Mage_Core_Controller_Front_Acti
              * - Approve the order in touch
              * - set a transaction ID
              * - set Order to paid
-             * - take care of invoice shit
              */
             $apprReturn = $this->_approveTouchOrder($order);
             $this->_handleTouchApprovalResponse($order, $apprReturn);
@@ -182,11 +181,23 @@ class Touch_TouchPayment_IndexController extends Mage_Core_Controller_Front_Acti
         $order = Mage::getModel('sales/order')->loadByAttribute('touch_token', $token);
 
         if ($order) {
-            $status = Mage::getStoreConfig('payment/touch_touchpayment/order_status');
-            $order->setStatus($status);
-            $order->setState('processing');
+            // Set order to touch-pending, or processing if the shipping method is to be bypassed.
+            $payment         = $order->getPayment();
+            $method          = $payment->getMethodInstance();
+            $shippingMethods = explode(',', $method->getConfigData('shipping_methods'));
+            $pendingSkipped  = false;
 
-            $order->save();
+            foreach ($shippingMethods as $skipShipping) {
+                if (strpos($order->getShippingMethod(), $skipShipping) !== false) {
+                    $orderStatus = $method->getConfigData('order_status');
+                    $order->se  tState(Mage_Sales_Model_Order::STATE_PROCESSING, $orderStatus)->save();
+                        $pendingSkipped = true;
+                    }
+            }
+
+            if (!$pendingSkipped) {
+                $order->setState(Mage_Sales_Model_Order::STATE_NEW, Touch_TouchPayment_Model_Sales_Order::STATUS_TOUCH_PENDING)->save();
+            }
 
             exit(json_encode(array('status' => 'success')));
         }
@@ -232,10 +243,22 @@ class Touch_TouchPayment_IndexController extends Mage_Core_Controller_Front_Acti
                     ->setIsCustomerNotified(true)
                     ->save();
 
-                // Set order to processing, all good.
-                $method = $payment->getMethodInstance();
-                $orderStatus = $method->getConfigData('order_status');
-                $order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, $orderStatus)->save();
+                // Set order to touch-pending, or processing if the shipping method is to be bypassed.
+                $method          = $payment->getMethodInstance();
+                $shippingMethods = explode(',', $method->getConfigData('shipping_methods'));
+                $pendingSkipped  = false;
+
+                foreach ($shippingMethods as $skipShipping) {
+                    if (strpos($order->getShippingMethod(), $skipShipping) !== false) {
+                        $orderStatus = $method->getConfigData('order_status');
+                        $order->se  tState(Mage_Sales_Model_Order::STATE_PROCESSING, $orderStatus)->save();
+                        $pendingSkipped = true;
+                    }
+                }
+
+                if (!$pendingSkipped) {
+                    $order->setState(Mage_Sales_Model_Order::STATE_NEW, Touch_TouchPayment_Model_Sales_Order::STATUS_TOUCH_PENDING)->save();
+                }
 
             } catch (Mage_Core_Exception $e) {
                 Mage::getSingleton('adminhtml/session')->addError($e->getMessage());

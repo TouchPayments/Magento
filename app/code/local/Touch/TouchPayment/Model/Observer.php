@@ -110,7 +110,7 @@ class Touch_TouchPayment_Model_Observer {
             ->join('sales_flat_order_payment', 'main_table.entity_id=sales_flat_order_payment.entity_id', false, null, 'inner')
             ->limit(40);
 
-        foreach($orderCollection->getItems() as $order) {
+        foreach ($orderCollection->getItems() as $order) {
 
             $orderModel = Mage::getModel('sales/order');
             $orderModel->load($order['entity_id']);
@@ -121,6 +121,32 @@ class Touch_TouchPayment_Model_Observer {
             }
         }
 
+    }
+
+    /**
+     * Cronjob to set orders in the initial Touch Payments - Pending status
+     * into Processing providing they haven't been put on hold by the Touch
+     * Payments team.
+     */
+    public function processOrders()
+    {
+        $orderCollection = Mage::getResourceModel('sales/order_collection');
+
+        $orderCollection
+            ->addFieldToFilter('status', Touch_TouchPayment_Model_Sales_Order::STATUS_TOUCH_PENDING)
+            ->addFieldToFilter('state', 'new')
+            ->addFieldToFilter('created_at', array(
+                'lt' =>  new Zend_Db_Expr("DATE_ADD('".now()."', INTERVAL - 2 HOUR)")));
+
+        $payment = new Touch_TouchPayment_Model_Payment();
+        foreach ($orderCollection->getItems() as $order) {
+
+            $orderModel = Mage::getModel('sales/order');
+            $orderModel->load($order['entity_id']);
+
+            $orderStatus = $payment->getConfigData('order_status');
+            $orderModel->setState(Mage_Sales_Model_Order::STATE_PROCESSING, $orderStatus)->save();
+        }
     }
 
     public function cancelOrder(Varien_Event_Observer $observer)

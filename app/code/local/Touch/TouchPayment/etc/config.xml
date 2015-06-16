@@ -7,7 +7,7 @@
             this one correlates with tha bloody
             sql scripts naming convenrions
             -->
-            <version>0.3.0</version>
+            <version>0.4.0</version>
         </Touch_TouchPayment>
     </modules>
     <!--
@@ -283,6 +283,10 @@
                 <schedule><cron_expr>*/15 * * * *</cron_expr></schedule>
                 <run><model>touch_touchpayment/observer::autoCancelPendingOrders</model></run>
             </order_cancel_orders>
+            <touch_process_orders>
+                <schedule><cron_expr>*/1 * * * *</cron_expr></schedule>
+                <run><model>touch_touchpayment/observer::processOrders</model></run>
+            </touch_process_orders>
         </jobs>
     </crontab>
 
