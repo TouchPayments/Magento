@@ -42,6 +42,7 @@ class Touch_TouchPayment_Model_Data_Helper
         }
 
         $touchOrder = new Touch_Order();
+        $touchOrder->merchantRefNumber = $order->getIncrementId();
         $touchOrder->addressBilling = self::processAddress($order->getBillingAddress());
         $touchOrder->addressShipping = self::processAddress($order->getShippingAddress());
         $grandTotal

@@ -7,6 +7,11 @@
 class Touch_Order extends Touch_Object {
 
     /**
+     * @var String
+     */
+    public $merchantRefNumber;
+
+    /**
      * @var Float
      */
     public $grandTotal;

@@ -126,7 +126,7 @@ class Touch_TouchPayment_ExpressController extends Mage_Core_Controller_Front_Ac
         }
 
         if ($o instanceof Mage_Sales_Model_Order) {
-            exit(json_encode(array('status' => 'success')));
+            exit(json_encode(array('status' => 'success', 'merchantRefNumber' => $o->getIncrementId())));
         } else {
             exit(json_encode(array('status' => 'error', 'message' => $o)));
         }

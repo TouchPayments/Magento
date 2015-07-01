@@ -90,9 +90,6 @@ class Touch_TouchPayment_Model_Payment extends Mage_Payment_Model_Method_Abstrac
 
             $order = $payment->getOrder();
 
-            //if ($order->getCustomerIsGuest()) {
-            //    Mage::throwException('Currently not for Guest Checkout...');
-            //}
             $addresses = $order->getAddressesCollection();
             foreach ($addresses as $address) {
                 if ($address->getAddressType() == 'shipping') {
@@ -102,7 +99,6 @@ class Touch_TouchPayment_Model_Payment extends Mage_Payment_Model_Method_Abstrac
 
             $touchOrder = Touch_TouchPayment_Model_Data_Helper::getTouchOrder($order);
             $touchApi = new Touch_TouchPayment_Model_Api_Touch();
-
 
             $response = $touchApi->generateOrder($touchOrder);
 
