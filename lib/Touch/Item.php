@@ -16,6 +16,7 @@ class Touch_Item extends Touch_Object {
     const STATUS_NEW = 'new';
     const STATUS_OVERDUE = 'overdue';
     const STATUS_PAID = 'paid';
+    const STATUS_PAID_UPFRONT = 'paidUpfront';
     const STATUS_PAYMENTDELAYED = 'paymentDelayed';
     const STATUS_PAYMENTREFUSED = 'paymentRefused';
     const STATUS_PENDING = 'pending';
@@ -25,6 +26,12 @@ class Touch_Item extends Touch_Object {
     const STATUS_RETURNEDAFTERPAYMENT = 'returnedAfterPayment';
     const STATUS_SHIPPED = 'shipped';
     const STATUS_UNABLETOFULLFILL = 'unableToFullFill';
+
+    public static $shippableStatus = array(
+        self::STATUS_APPROVED,
+        self::STATUS_PAID_UPFRONT,
+        self::STATUS_CANCELLED
+    );
 
     /**
      * @var String

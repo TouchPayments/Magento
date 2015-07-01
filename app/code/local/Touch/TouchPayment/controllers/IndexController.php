@@ -190,7 +190,7 @@ class Touch_TouchPayment_IndexController extends Mage_Core_Controller_Front_Acti
             foreach ($shippingMethods as $skipShipping) {
                 if (strpos($order->getShippingMethod(), $skipShipping) !== false) {
                     $orderStatus = $method->getConfigData('order_status');
-                    $order->se  tState(Mage_Sales_Model_Order::STATE_PROCESSING, $orderStatus)->save();
+                    $order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, $orderStatus)->save();
                         $pendingSkipped = true;
                     }
             }
@@ -207,7 +207,7 @@ class Touch_TouchPayment_IndexController extends Mage_Core_Controller_Front_Acti
 
     private function _handleTouchApprovalResponse(Mage_Sales_Model_Order $order, $apprReturn)
     {
-        if ($apprReturn->result->status == 'approved') {
+        if (in_array($apprReturn->result->status, Touch_Item::$shippableStatus)) {
             $order->addStatusHistoryComment('Touch Status : ----')
                 ->setIsCustomerNotified(false)
                 ->save();
@@ -251,7 +251,7 @@ class Touch_TouchPayment_IndexController extends Mage_Core_Controller_Front_Acti
                 foreach ($shippingMethods as $skipShipping) {
                     if (strpos($order->getShippingMethod(), $skipShipping) !== false) {
                         $orderStatus = $method->getConfigData('order_status');
-                        $order->se  tState(Mage_Sales_Model_Order::STATE_PROCESSING, $orderStatus)->save();
+                        $order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, $orderStatus)->save();
                         $pendingSkipped = true;
                     }
                 }

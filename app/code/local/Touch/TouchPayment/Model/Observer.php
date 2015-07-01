@@ -192,7 +192,7 @@ class Touch_TouchPayment_Model_Observer {
         $shippable = array();
 
         foreach ($touchOrder->items as $item) {
-            if ($item->status == 'approved') {
+            if (in_array($item->status, Touch_Item::$shippableStatus)) {
                 if (empty($shippable[$item->sku])) {
                     $shippable[$item->sku] = array($item->id);
                 } else {
