@@ -284,7 +284,8 @@
                 <run><model>touch_touchpayment/observer::autoCancelPendingOrders</model></run>
             </order_cancel_orders>
             <touch_process_orders>
-                <schedule><cron_expr>*/1 * * * *</cron_expr></schedule>
+                <!-- Run this every weekday at 11:00, 13:00 and 15:00 -->
+                <schedule><cron_expr>00 11,13,15 * * 1-5</cron_expr></schedule>
                 <run><model>touch_touchpayment/observer::processOrders</model></run>
             </touch_process_orders>
         </jobs>

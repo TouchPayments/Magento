@@ -136,7 +136,7 @@ class Touch_TouchPayment_Model_Observer {
             ->addFieldToFilter('status', Touch_TouchPayment_Model_Sales_Order::STATUS_TOUCH_PENDING)
             ->addFieldToFilter('state', 'new')
             ->addFieldToFilter('created_at', array(
-                'lt' =>  new Zend_Db_Expr("DATE_ADD('".now()."', INTERVAL - 2 HOUR)")));
+                'lt' =>  new Zend_Db_Expr("DATE_ADD('".now()."', INTERVAL - 1 HOUR)")));
 
         $payment = new Touch_TouchPayment_Model_Payment();
         foreach ($orderCollection->getItems() as $order) {
