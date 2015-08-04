@@ -107,7 +107,7 @@ class Touch_TouchPayment_Model_Observer {
                     'lt' =>  new Zend_Db_Expr("DATE_ADD('".now()."', INTERVAL -'60:00' HOUR_MINUTE)")))
             ->addFieldToFilter('sales_flat_order_payment.method', Touch_TouchPayment_Model_Payment::METHOD_TOUCH)
             ->getSelect()
-            ->join('sales_flat_order_payment', 'main_table.entity_id=sales_flat_order_payment.entity_id', false, null, 'inner')
+            ->join('sales_flat_order_payment', 'main_table.entity_id=sales_flat_order_payment.parent_id', false, null, 'inner')
             ->limit(40);
 
         foreach ($orderCollection->getItems() as $order) {

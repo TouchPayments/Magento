@@ -176,6 +176,7 @@ class Touch_TouchPayment_Model_OrderHandler extends Mage_Core_Model_Abstract
 
 
                 $_order->setTouchToken($this->_sourceQuote->getTouchToken());
+                $_order->setState(Mage_Sales_Model_Order::STATE_NEW, true);
                 $_order->save();
 
                 $this->_getSession()->clear();

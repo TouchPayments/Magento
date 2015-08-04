@@ -205,6 +205,33 @@ class Touch_TouchPayment_IndexController extends Mage_Core_Controller_Front_Acti
         else exit(json_encode(array('status' => 'error')));
     }
 
+    public function cancelAction()
+    {
+        $token = $this->getRequest()->getParam('token');
+        $order = Mage::getModel('sales/order')->loadByAttribute('touch_token', $token);
+
+        if ($order) {
+            $data = array('qtys' => array());
+            $service = Mage::getModel('sales/service_order', $order);
+            foreach ($order->getItemsCollection() as $item) {
+                $data['qtys'][$item->getId()] = $item->getQtyInvoiced();
+            }
+
+            // Create a credit memo and get all items back to stock
+            $creditMemo = $service->prepareCreditmemo($data);
+            foreach ($creditMemo->getAllItems() as $creditmemoItem) {
+                $creditmemoItem->setBackToStock(true);
+            }
+
+            $creditMemo->register()->save();
+            $order->setState(Mage_Sales_Model_Order::STATE_CANCELED, true)->save();
+
+            exit(json_encode(array('status' => 'success')));
+        }
+
+        else exit(json_encode(array('status' => 'error')));
+    }
+
     private function _handleTouchApprovalResponse(Mage_Sales_Model_Order $order, $apprReturn)
     {
         if (in_array($apprReturn->result->status, Touch_Item::$shippableStatus)) {
