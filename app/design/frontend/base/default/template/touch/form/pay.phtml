@@ -1,5 +1,5 @@
 <?php $this->getOrderData(); ?>
-<ul class="form-list" id="payment_form_<?= $this->getMethodCode() ?>">
+<ul class="form-list" id="payment_form_<?= $this->getMethodCode() ?>" style="display:none;">
     <li>
         Checkout with Touch Payments and <strong>pay after you receive your products</strong>. <a href="http://touchpayments.com.au/what-is-touch?merchant=<?= urlencode(Mage::app()->getStore()->getName()); ?>" target="_blank">Find out more.</a>
     </li>
