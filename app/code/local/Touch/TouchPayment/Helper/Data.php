@@ -9,4 +9,12 @@ class Touch_TouchPayment_Helper_Data extends Mage_Core_Helper_Abstract
 	public function formatFee($amount){
 		return Mage::helper('fee')->__('Fee');
 	}
+
+	/**
+	 * @return string
+	 */
+	public function getExtensionVersion()
+	{
+		return (string) Mage::getConfig()->getNode()->modules->Touch_TouchPayment->version;
+	}
 }
