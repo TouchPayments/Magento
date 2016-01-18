@@ -123,7 +123,6 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </api_url>
-
                         <shipping_methods translate="label">
                             <label>Shipping Methods skipping Pending</label>
                             <frontend_type>multiselect</frontend_type>
@@ -134,6 +133,15 @@
                             <show_in_store>1</show_in_store>
                             <comment>Any orders using any of the shipping methods selected here will skip the Touch Payments - Pending status. This should only be used in same day delivery carriers.</comment>
                         </shipping_methods>
+                        <visible_on_minicart translate="label">
+                            <label>Visible in Minicart</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>11</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </visible_on_minicart>
                     </fields>
                 </touch_touchexpress>
             </groups>

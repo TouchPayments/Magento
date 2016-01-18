@@ -52,6 +52,10 @@
                 <action method="addItem"><type>skin_js</type><name>js/touchpayments/opcheckout.js</name><params/></action>
             </block>
         </reference>
+        <!-- mini cart !?-->
+        <reference name="cart_sidebar.extra_actions">
+            <block type="page/html_head" name="touch.express.cart_sidebar.button" template="touch/express/minicart.phtml"/>
+        </reference>
     </default>
 
     <!-- Touch Express Checkout -->

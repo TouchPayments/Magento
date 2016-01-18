@@ -1,0 +1,39 @@
+<?php
+$model = new Touch_TouchPayment_Model_Express();
+
+//test the Touch system config if this button should be visible here
+if(empty($model->getConfigData('visible_on_minicart'))){
+    return;
+}
+
+$tokens = explode('/', $_SERVER[REQUEST_URI]);
+// dc_todo: get this up there... mini cart
+$touch = new Touch_TouchPayment_Block_Express_Button();
+$touchUrl = $touch->getTouchUrl();
+?>
+<div id="touch_minicart_test"></div>
+
+<script>
+    (function() {
+        var content = '<div id="top_cart_touch_button">'+
+            '<script'+
+            'src="<?= (($tokens[sizeof($tokens)-2]) == "cart") ? "" : $touchUrl?>/js/express.js" class="touch-express-button" id="touch-express-button"'+
+            'data-url="/touchredirect/express/index"'+
+            'data-success-url="/touchredirect"'+
+            'data-message="Buy now pay later"><\/script>'+
+            '</div>';
+
+        var test = document.getElementById('touch_minicart_test');
+
+        var newElementType = 'div';
+        if(test.parentElement.nodeName == 'UL'){
+            newElementType = 'li';
+        }
+        var newElement = document.createElement(newElementType);
+        newElement.innerHTML = content;
+
+        test.parentNode.insertBefore(newElement,test.nextSibling);
+
+        test.remove();
+    })();
+</script>
