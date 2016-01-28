@@ -288,13 +288,11 @@ class Touch_Client {
     private function _callMethod($method, $data)
     {
         $params = array(
-            'jsonrpc’ => ’2.0',
+            'jsonrpc' => '2.0',
             'method' => $method,
             'params' => $data,
             'id' => uniqid()
         );
-
-
 
         $context = stream_context_create(array(
             'http' => array(
@@ -308,5 +306,4 @@ class Touch_Client {
 
         return json_decode($jsonResponse);
     }
-
 }
