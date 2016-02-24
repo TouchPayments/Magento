@@ -55,6 +55,9 @@ class Touch_TouchPayment_ExpressController extends Mage_Core_Controller_Front_Ac
         $addressShipping = json_decode($this->getRequest()->getParam('addressShipping'), true);
 
         if ($addressShipping) {
+            /**
+             * @var $quote Mage_Sales_Model_Quote
+             */
             $quote = Mage::getModel('sales/quote')->load($this->getRequest()->getParam('token'), 'touch_token');
             Mage::getSingleton('checkout/session')->setQuoteId($quote->getId());
 
@@ -74,7 +77,8 @@ class Touch_TouchPayment_ExpressController extends Mage_Core_Controller_Front_Ac
                 ->setStreet($addressTouch->addressOne)
                 ->setCollectShippingRates(true);
 
-            $address->collectShippingRates()->save();
+            $address->collectTotals();//this fixes missing free shipping methods in most merchants
+            //$address->collectShippingRates()->save();
             $rates = $address->getGroupedAllShippingRates();
 
             $shippingMethods = array();

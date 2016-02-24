@@ -28,7 +28,7 @@ $touchEndpoint = $touch->getTouchUrl();
         containerElem.setAttribute('id', "top_cart_touch_button");
         newElement.appendChild(containerElem);
 
-        <?php if($tokens[sizeof($tokens)-2] == "cart"){ //on cart page just render an empty div with this class - btn gets generated autom.?>
+        <?php if($tokens[sizeof($tokens)-2] == "cart" || strpos($_SERVER['REQUEST_URI'],'checkout/cart') !== false){ //on cart page just render an empty div with this class - btn gets generated autom.?>
         var containerButton = document.createElement('div');
         containerButton.setAttribute('class', "touch-express-button");
         containerElem.appendChild(containerButton);
@@ -45,7 +45,7 @@ $touchEndpoint = $touch->getTouchUrl();
         tag.setAttribute('id', "touch-express-button");
         tag.setAttribute('data-url', "/touchredirect/express/index");
         tag.setAttribute('data-success-url', "/touchredirect");
-        tag.setAttribute('data-message', "Buy now pay later");
+        //tag.setAttribute('data-message', "Try before you buy");
         containerElem.appendChild(tag);
         <?php } ?>
 
