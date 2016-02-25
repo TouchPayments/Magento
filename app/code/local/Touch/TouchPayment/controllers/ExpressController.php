@@ -77,7 +77,7 @@ class Touch_TouchPayment_ExpressController extends Mage_Core_Controller_Front_Ac
                 ->setStreet($addressTouch->addressOne)
                 ->setCollectShippingRates(true);
 
-            $address->collectTotals();//this fixes missing free shipping methods in most merchants
+            $address->collectTotals()->save();//this fixes missing free shipping methods in most merchants
             //$address->collectShippingRates()->save();
             $rates = $address->getGroupedAllShippingRates();
 
