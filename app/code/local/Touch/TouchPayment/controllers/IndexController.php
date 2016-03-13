@@ -188,7 +188,7 @@ class Touch_TouchPayment_IndexController extends Mage_Core_Controller_Front_Acti
             $pendingSkipped  = false;
 
             foreach ($shippingMethods as $skipShipping) {
-                if (strpos($order->getShippingMethod(), $skipShipping) !== false) {
+                if (!empty($skipShipping) && strpos($order->getShippingMethod(), $skipShipping) !== false) {
                     $orderStatus = $method->getConfigData('order_status');
                     $order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, $orderStatus)->save();
                         $pendingSkipped = true;
@@ -276,7 +276,7 @@ class Touch_TouchPayment_IndexController extends Mage_Core_Controller_Front_Acti
                 $pendingSkipped  = false;
 
                 foreach ($shippingMethods as $skipShipping) {
-                    if (strpos($order->getShippingMethod(), $skipShipping) !== false) {
+                    if (!empty($skipShipping) && strpos($order->getShippingMethod(), $skipShipping) !== false) {
                         $orderStatus = $method->getConfigData('order_status');
                         $order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, $orderStatus)->save();
                         $pendingSkipped = true;
